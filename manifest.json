@@ -2,38 +2,13 @@
   "id": "bracque007.lighting-buro-v1",
   "name": "LightingBuro - Lighting Calculator",
   "short_name": "LightingBuro",
-  "description": "Professional lighting calculator for homes, schools, offices, hospitals and apartments. Supports 9 languages.",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#F1F5F9",
-  "theme_color": "#0B2B40",
-  "orientation": "any",
-  "lang": "en",
-  "categories": ["utilities", "productivity", "education"],
+  "description": "Professional lighting calculator...",
+  ...
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192.png",     ← LOKAAL! Geen https://
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      ...
     }
   ]
 }
