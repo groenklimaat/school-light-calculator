@@ -1,1426 +1,1235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School Light Calculator | GroenKlimaat</title>
-
+<title>School Light Calculator</title>
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#10B981">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SchoolLight">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
-
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <style>
-:root {
-  --green: #10B981;
-  --green-dark: #059669;
-  --green-light: #D1FAE5;
-  --sun: #FFB347;
-  --sun-dark: #FF8C00;
-  --blue: #3B82F6;
-  --dark: #0F172A;
-  --text: #0F172A;
-  --text-light: #64748B;
-  --text-muted: #94A3B8;
-  --bg: #F0FDF4;
-  --card: #FFFFFF;
-  --border: #D1FAE5;
-  --border-light: #ECFDF5;
-  --slider-bg: #D1FAE5;
-  --slider-fg: #10B981;
-}
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
+:root {
+  --primary: #065F46; --primary-light: #10B981; --accent: #FCD34D;
+  --accent-hover: #FDE68A; --success: #059669; --success-hover: #10B981;
+  --bg: #ECFDF5; --card-bg: #FFFFFF; --panel-bg: #F0FDF4;
+  --border: #D1FAE5; --text: #064E3B; --text-light: #059669;
+  --slider-bg: #A7F3D0; --slider-fg: #10B981;
+  --result-bg: #ECFDF5; --result-border: #6EE7B7;
+}
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  min-height: 100vh;
-  padding: 20px;
-  -webkit-font-smoothing: antialiased;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px;
 }
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  background: var(--card);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--border);
-  position: relative;
+.app-container {
+  max-width: 1420px; margin: 0 auto; background: var(--card-bg);
+  border-radius: 12px; box-shadow: 0 4px 24px rgba(6, 78, 59, 0.12);
+  overflow: hidden; border: 1px solid #A7F3D0;
 }
-
-/* Language Selector */
-.language-selector {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 100;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  padding: 5px;
-  border-radius: 50px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  max-width: 70%;
+.header { background: var(--primary); padding: 18px 30px 14px; color: white; }
+.header-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  flex-wrap: wrap; gap: 12px;
 }
-
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-brand .logo-img {
+  width: 44px; height: 44px; object-fit: contain; border-radius: 8px;
+  background: rgba(255,255,255,0.1); padding: 2px; flex-shrink: 0;
+}
+.header-brand h1 { font-size: 22px; font-weight: 700; line-height: 1.2; }
+.header-brand p { font-size: 12px; color: #A7F3D0; margin-top: 2px; }
+.lang-buttons { display: flex; gap: 3px; flex-wrap: wrap; }
 .lang-btn {
-  padding: 6px 10px;
-  background: transparent;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.72rem;
-  color: var(--text-light);
-  transition: all 0.2s;
-  font-family: inherit;
+  background: var(--primary-light); color: #D1FAE5; border: none;
+  padding: 6px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; min-width: 34px; font-family: inherit;
 }
-.lang-btn:hover { background: var(--green-light); color: var(--text); }
-.lang-btn.active { background: var(--green); color: white; box-shadow: 0 2px 6px rgba(16,185,129,0.4); }
-
-/* HEADER */
-.header {
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-  padding: 65px 40px 30px;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  text-align: center;
+.lang-btn:hover { background: #34D399; color: white; }
+.lang-btn.active { background: var(--accent); color: var(--primary); }
+.header-info {
+  display: flex; gap: 28px; margin-top: 14px; flex-wrap: wrap; font-size: 13px;
 }
-.header::before {
-  content: '';
-  position: absolute;
-  top: -80px; right: -60px;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-  border-radius: 50%;
+.header-info-item { display: flex; align-items: center; gap: 5px; color: #A7F3D0; }
+.header-info-item .value { color: white; font-weight: 600; }
+.content { display: flex; min-height: 700px; }
+.left-panel {
+  width: 440px; min-width: 440px; background: var(--panel-bg); padding: 25px;
+  overflow-y: auto; max-height: 80vh; border-right: 1px solid var(--border);
 }
-.header::after {
-  content: '';
-  position: absolute;
-  bottom: -100px; left: -80px;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(255,179,71,0.2) 0%, transparent 70%);
-  border-radius: 50%;
+.right-panel {
+  flex: 1; padding: 30px; overflow-y: auto; max-height: 80vh; background: var(--card-bg);
 }
-.header-content { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
-.header h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-.header h1 .emoji { font-size: 2.8rem; }
-.header p {
-  font-size: 1.05rem;
-  color: rgba(255,255,255,0.9);
-  margin-bottom: 15px;
-}
-.header-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-/* School Year Banner */
-.school-year-banner {
-  background: linear-gradient(90deg, var(--green-light) 0%, #A7F3D0 100%);
-  padding: 15px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  font-weight: 700;
-  color: var(--green-dark);
-  font-size: 1rem;
-  border-bottom: 3px solid var(--green);
-}
-.school-year-banner .icon { font-size: 1.5rem; }
-
-/* Main Content */
-.main-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
-  padding: 30px;
-}
-@media (max-width: 1024px) { .main-content { grid-template-columns: 1fr; } }
-
-.section-card {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 25px;
-}
-
 .section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 3px solid var(--green-light);
+  display: flex; align-items: center; gap: 8px; font-size: 13px;
+  font-weight: 700; color: #047857; margin-bottom: 10px; margin-top: 20px;
 }
-.section-title .icon { font-size: 1.4rem; }
-
-/* Input Fields */
-.field {
-  margin-bottom: 16px;
+.section-title:first-child { margin-top: 0; }
+.info-block {
+  background: white; border: 1px solid var(--border); border-radius: 8px;
+  padding: 15px 18px; margin-bottom: 5px;
 }
-.field label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
+.field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.field-row:last-child { margin-bottom: 0; }
+.field-row label {
+  font-size: 13px; font-weight: 600; color: #065F46;
+  width: 130px; min-width: 130px;
 }
-.field input, .field select {
-  width: 100%;
-  padding: 12px 15px;
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  color: var(--text);
-  background: white;
-  outline: none;
-  font-weight: 500;
-  transition: all 0.2s;
+.field-row input, .field-row select {
+  flex: 1; padding: 8px 10px; border: 2px solid #A7F3D0; border-radius: 6px;
+  font-size: 13px; font-family: inherit; color: var(--text); background: white;
+  transition: border-color 0.2s; outline: none; min-width: 0;
 }
-.field input:focus, .field select:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+.field-row input:focus, .field-row select:focus { border-color: var(--primary-light); }
+.radio-group { display: flex; flex-direction: column; gap: 8px; }
+.radio-group label {
+  display: flex; align-items: center; gap: 8px; font-size: 13px;
+  font-weight: 500; color: #065F46; cursor: pointer; padding: 6px 8px;
+  border-radius: 6px; transition: background 0.15s;
 }
-.field-hint {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 5px;
-  font-style: italic;
+.radio-group label:hover { background: #F0FDF4; }
+.radio-group input[type="radio"] {
+  width: 16px; height: 16px; accent-color: var(--primary-light); cursor: pointer;
 }
-
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+.disclaimer {
+  background: #ECFDF5; color: #065F46; padding: 10px 15px;
+  border-radius: 8px; font-size: 12px; margin-top: 15px;
+  border-left: 4px solid var(--primary-light);
 }
-@media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
-
-/* Sliders */
-.slider-card {
-  background: var(--border-light);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 12px;
+.main-title {
+  display: flex; align-items: center; gap: 10px; font-size: 20px;
+  font-weight: 700; color: var(--primary); margin-bottom: 15px;
 }
-.slider-card .slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.slider-card .slider-label {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.slider-card .slider-value {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--green-dark);
-  background: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 2px solid var(--border);
-}
-.slider-card input[type="range"] {
-  width: 100%;
-  height: 8px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: linear-gradient(to right, var(--green) 0%, var(--sun) 100%);
-  border-radius: 4px;
-  outline: none;
-  cursor: pointer;
-}
-.slider-card input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  background: white;
-  border: 4px solid var(--green);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(16,185,129,0.4);
-}
-
-/* Results */
-.results-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-@media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
-
-.result-card {
-  background: var(--border-light);
-  border-radius: 14px;
-  padding: 20px;
-  text-align: center;
-  border: 2px solid var(--border);
-  transition: all 0.3s;
-}
-.result-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(16,185,129,0.15); }
-.result-card.primary {
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 6px 20px rgba(16,185,129,0.3);
-}
-.result-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  color: var(--text-light);
-}
-.result-card.primary .result-label { color: rgba(255,255,255,0.85); }
-.result-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.1;
-}
-.result-card.primary .result-value { color: white; }
-.result-unit {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 5px;
-  font-weight: 600;
-}
-.result-card.primary .result-unit { color: rgba(255,255,255,0.8); }
-
-/* CO2 Visualization */
-.co2-viz {
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-  border-radius: 14px;
-  padding: 20px;
-  border: 2px solid var(--green-light);
-  margin-bottom: 20px;
-}
-.co2-viz h3 {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--green-dark);
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.co2-equivalents {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-@media (max-width: 600px) { .co2-equivalents { grid-template-columns: 1fr; } }
-.co2-item {
-  background: white;
-  border-radius: 10px;
-  padding: 12px;
-  text-align: center;
-  border: 1px solid var(--green-light);
-}
-.co2-item .emoji { font-size: 1.8rem; display: block; margin-bottom: 5px; }
-.co2-item .val {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--green-dark);
-}
-.co2-item .lbl {
-  font-size: 0.75rem;
-  color: var(--text-light);
-  margin-top: 3px;
-}
-
-/* Tips Box */
-.tips-box {
-  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
-  border-left: 5px solid var(--sun);
-  border-radius: 12px;
-  padding: 18px;
-  margin-top: 20px;
-}
-.tips-box h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #92400E;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tips-box ul {
-  list-style: none;
-  padding: 0;
-}
-.tips-box li {
-  font-size: 0.85rem;
-  color: #78350F;
-  padding: 6px 0;
-  padding-left: 22px;
-  position: relative;
-  line-height: 1.5;
-}
-.tips-box li::before {
-  content: '→';
-  position: absolute;
-  left: 0;
-  color: var(--sun-dark);
-  font-weight: 800;
-}
-
-/* Presets */
-.presets {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-.preset-btn {
-  background: white;
-  border: 2px solid var(--border);
-  color: var(--text);
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-.preset-btn:hover { border-color: var(--green); background: var(--green-light); }
-.preset-btn.active { background: var(--green); color: white; border-color: var(--green); }
-
-/* Energy Label */
 .energy-label-row {
-  background: var(--border-light);
-  border-radius: 14px;
-  padding: 15px 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-  border: 2px solid var(--border);
+  background: #ECFDF5; border: 2px solid #6EE7B7;
+  border-radius: 10px; padding: 12px 20px; display: flex; align-items: center;
+  gap: 20px; flex-wrap: wrap; margin-bottom: 15px;
 }
 .label-pill {
-  background: var(--green);
-  color: white;
-  font-size: 1.6rem;
-  font-weight: 800;
-  padding: 8px 20px;
-  border-radius: 10px;
-  min-width: 70px;
-  text-align: center;
+  font-size: 24px; font-weight: 800; color: white; padding: 8px 28px;
+  border-radius: 8px; min-width: 80px; text-align: center; transition: background 0.3s;
 }
 .badge {
-  background: white;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--green-dark);
-  border: 2px solid var(--border);
+  background: white; padding: 8px 18px; border-radius: 8px; font-size: 13px;
+  font-weight: 600; color: #065F46; border: 2px solid #6EE7B7;
 }
-
-/* Buttons */
-.button-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 20px;
+.badge.lmw { font-size: 15px; font-weight: 700; }
+.presets-label { font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+.presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+.preset-btn {
+  background: white; color: #065F46; border: 2px solid #A7F3D0;
+  padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
 }
-.btn {
-  padding: 14px 24px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  font-family: inherit;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.preset-btn:hover { border-color: var(--primary-light); background: #F0FDF4; }
+.preset-btn.active {
+  background: var(--primary-light); color: white; border-color: var(--primary-light);
 }
-.btn-primary {
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(16,185,129,0.3);
-  flex: 1;
-  justify-content: center;
+.price-box {
+  background: #F0FDF4; border: 2px solid #A7F3D0; border-radius: 10px;
+  padding: 12px 20px; display: flex; align-items: center; gap: 10px;
+  margin-bottom: 15px; flex-wrap: wrap;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,185,129,0.4); }
-.btn-outline {
-  background: white;
-  color: var(--text);
-  border: 2px solid var(--border);
+.price-box .price-title {
+  font-size: 14px; font-weight: 700; color: var(--primary);
+  flex: 1; min-width: 120px;
 }
-.btn-outline:hover { border-color: var(--green); background: var(--green-light); }
-
-/* Ko-fi Button */
-.kofi-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, #FF5E5B 0%, #FF3D3D 100%);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 0.85rem;
-  box-shadow: 0 6px 20px rgba(255,93,91,0.4);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-  z-index: 999;
+.price-box input {
+  width: 100px; padding: 8px; border: 2px solid #34D399;
+  border-radius: 6px; font-size: 15px; font-weight: 700; color: #065F46;
+  text-align: right; font-family: inherit; outline: none;
 }
-.kofi-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,93,91,0.5); }
-
-/* Install Button */
-#installBtn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-  color: white;
-  border: none;
-  padding: 12px 22px;
-  border-radius: 30px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  font-family: inherit;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(16,185,129,0.4);
-  display: none;
-  align-items: center;
-  gap: 8px;
-  z-index: 999;
+.price-box input:focus { border-color: var(--primary-light); }
+.price-box select {
+  padding: 8px; border: 2px solid #34D399; border-radius: 6px;
+  font-size: 13px; font-weight: 700; color: #065F46; font-family: inherit;
+  background: white; cursor: pointer; outline: none;
 }
-#installBtn.show { display: inline-flex; }
-
-/* Footer */
-footer {
-  background: var(--dark);
-  color: white;
-  padding: 30px;
+.price-box .unit { font-size: 13px; font-weight: 700; color: #047857; }
+.sliders-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;
+}
+.slider-card {
+  background: #F0FDF4; border: 2px solid #D1FAE5; border-radius: 8px; padding: 15px;
+}
+.slider-card .slider-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; gap: 8px;
+}
+.slider-card .slider-header .label {
+  font-size: 13px; font-weight: 700; color: #065F46;
+  display: flex; align-items: center; gap: 5px;
+}
+.slider-card .slider-header .value {
+  font-size: 13px; font-weight: 700; color: var(--primary-light);
+}
+.num-input {
+  width: 80px; padding: 4px 6px; border: 2px solid #A7F3D0;
+  border-radius: 6px; font-size: 13px; font-weight: 700; color: #047857;
+  text-align: right; font-family: inherit; outline: none; background: white;
+}
+.num-input:focus { border-color: var(--primary-light); background: #F0FDF4; }
+.slider-card input[type="range"] {
+  width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+  background: var(--slider-bg); border-radius: 3px; outline: none;
+  cursor: pointer; margin: 8px 0 4px;
+}
+.slider-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--primary-light); cursor: pointer;
+  border: 3px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.slider-card input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; background: var(--primary-light);
+  cursor: pointer; border: 3px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.slider-card .display-value {
+  text-align: right; font-size: 16px; font-weight: 800; color: #065F46;
+}
+.info-row {
+  background: #ECFDF5; border-radius: 8px; padding: 10px 20px;
+  display: flex; gap: 30px; flex-wrap: wrap; font-size: 13px;
+  color: var(--text); margin-bottom: 15px; align-items: center;
+}
+.info-row .school-note { color: var(--success); font-weight: 700; }
+.results-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;
+}
+.result-card {
+  background: var(--result-bg); border: 2px solid var(--result-border);
+  border-radius: 10px; padding: 18px 20px;
+}
+.result-card .result-label {
+  display: flex; align-items: center; gap: 6px; font-size: 13px;
+  color: #047857; margin-bottom: 8px;
+}
+.result-card .result-value { display: flex; align-items: baseline; gap: 5px; }
+.result-card .result-value .num { font-size: 26px; font-weight: 800; color: #065F46; }
+.result-card .result-value .unit { font-size: 13px; color: #059669; font-weight: 500; }
+.result-card.primary {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--success) 100%);
+  border-color: var(--primary-light);
+}
+.result-card.primary .result-label { color: rgba(255,255,255,0.9); }
+.result-card.primary .result-value .num { color: white; }
+.result-card.primary .result-value .unit { color: rgba(255,255,255,0.85); }
+.tips-box {
+  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+  border-left: 4px solid var(--primary-light);
+  border-radius: 10px; padding: 20px; margin-bottom: 20px;
+}
+.tips-box h3 {
+  font-size: 15px; font-weight: 700; color: var(--primary);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.tips-box ul { list-style: none; padding-left: 0; }
+.tips-box li {
+  font-size: 13px; color: #065F46; padding: 6px 0;
+  padding-left: 24px; position: relative;
+}
+.tips-box li::before {
+  content: '💡'; position: absolute; left: 0; top: 6px;
+}
+.co2-visual {
+  background: white; border: 2px solid var(--result-border);
+  border-radius: 10px; padding: 18px 20px; margin-bottom: 20px;
+}
+.co2-visual h3 {
+  font-size: 14px; font-weight: 700; color: var(--primary);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.co2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.co2-item {
+  background: #F0FDF4; border-radius: 8px; padding: 12px;
   text-align: center;
 }
-footer .footer-content { max-width: 800px; margin: 0 auto; }
-footer p {
-  color: rgba(255,255,255,0.7);
-  font-size: 0.85rem;
-  margin-bottom: 8px;
-  line-height: 1.6;
+.co2-item .co2-icon { font-size: 24px; margin-bottom: 5px; }
+.co2-item .co2-value {
+  font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 3px;
 }
-footer strong { color: var(--green); }
-
-/* Responsive */
-@media (max-width: 768px) {
+.co2-item .co2-label { font-size: 11px; color: #059669; }
+.button-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+.btn {
+  padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; font-family: inherit; transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-light); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: var(--success-hover); }
+.btn-outline { background: white; color: var(--primary); border: 1px solid #6EE7B7; }
+.btn-outline:hover { background: #F0FDF4; }
+.btn-kofi {
+  background: #FF5E5B; color: white;
+  text-decoration: none;
+}
+.btn-kofi:hover { background: #FF3B38; }
+.footnote {
+  font-size: 12px; color: var(--text-light); line-height: 1.5; margin-bottom: 8px;
+}
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(6, 78, 59, 0.6);
+  z-index: 1000; justify-content: center; align-items: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg); border-radius: 12px; max-width: 750px; width: 100%;
+  max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-header {
+  background: var(--primary); padding: 20px; border-radius: 12px 12px 0 0;
+}
+.modal-header h2 { color: white; font-size: 20px; }
+.modal-header p { color: #A7F3D0; font-size: 12px; margin-top: 4px; }
+.modal-body { background: white; padding: 20px 25px; }
+.modal-section-title {
+  font-size: 15px; font-weight: 700; color: var(--primary); margin: 18px 0 8px;
+}
+.modal-section-title:first-child { margin-top: 0; }
+.modal-row {
+  display: flex; justify-content: space-between; padding: 5px 0;
+  border-bottom: 1px solid #E0E0E0; font-size: 13px;
+}
+.modal-row .label { color: #666; }
+.modal-row .value { font-weight: 700; color: var(--text); }
+.modal-footer {
+  padding: 15px 20px; display: flex; justify-content: flex-end;
+  gap: 10px; background: var(--bg); border-radius: 0 0 12px 12px;
+}
+#installBtn {
+  position: fixed; bottom: 24px; right: 24px; background: var(--primary-light);
+  color: white; border: none; padding: 12px 22px; border-radius: 30px;
+  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); display: none;
+  align-items: center; gap: 8px; z-index: 999; transition: all 0.2s;
+}
+#installBtn:hover {
+  background: var(--success-hover); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+}
+#installBtn.show { display: inline-flex; }
+@media (max-width: 1000px) {
+  .content { flex-direction: column; }
+  .left-panel {
+    width: 100%; min-width: unset; max-height: none;
+    border-right: none; border-bottom: 1px solid var(--border);
+  }
+  .right-panel { max-height: none; }
+}
+@media (max-width: 600px) {
   body { padding: 8px; }
-  .container { border-radius: 16px; }
-  .header { padding: 80px 20px 25px; }
-  .header h1 { font-size: 1.8rem; }
-  .header h1 .emoji { font-size: 2rem; }
-  .header p { font-size: 0.95rem; }
-  .main-content { padding: 20px; gap: 18px; }
-  .section-card { padding: 18px; }
-  .result-value { font-size: 1.6rem; }
-  .co2-equivalents { grid-template-columns: 1fr; }
-  .kofi-btn { bottom: 15px; right: 15px; font-size: 0.78rem; padding: 10px 16px; }
-  #installBtn { bottom: 15px; left: 15px; font-size: 0.78rem; padding: 10px 16px; }
+  .header { padding: 14px 16px 12px; }
+  .left-panel, .right-panel { padding: 16px; }
+  .sliders-grid, .results-grid, .co2-grid { grid-template-columns: 1fr; }
+  .header-info { gap: 14px; font-size: 12px; }
+  .field-row { flex-direction: column; align-items: stretch; gap: 4px; }
+  .field-row label { width: auto; }
+  .energy-label-row { flex-direction: column; align-items: flex-start; }
+  .button-row { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+  .header-brand .logo-img { width: 36px; height: 36px; }
+  #installBtn { bottom: 16px; right: 16px; padding: 10px 18px; }
 }
-
-/* Print styles (for PDF) */
-@media print {
-  body { background: white; padding: 0; }
-  .language-selector, .kofi-btn, #installBtn, .button-row { display: none !important; }
-  .container { box-shadow: none; border: 1px solid #ccc; }
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #ECFDF5; }
+::-webkit-scrollbar-thumb { background: #6EE7B7; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #34D399; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Language Selector -->
-  <div class="language-selector">
-    <button class="lang-btn active" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="nl">NL</button>
-    <button class="lang-btn" data-lang="de">DE</button>
-    <button class="lang-btn" data-lang="fr">FR</button>
-    <button class="lang-btn" data-lang="es">ES</button>
-    <button class="lang-btn" data-lang="it">IT</button>
-    <button class="lang-btn" data-lang="no">NO</button>
-    <button class="lang-btn" data-lang="sv">SV</button>
-    <button class="lang-btn" data-lang="pt">PT</button>
-  </div>
-
-  <!-- Header -->
+<div class="app-container">
   <header class="header">
-    <div class="header-content">
-      <h1>
-        <span class="emoji">🎓</span>
-        <span data-i18n="title">School Light Calculator</span>
-      </h1>
-      <p data-i18n="subtitle">Discover how much energy your school uses — and how to save it!</p>
-      <div class="header-badge" data-i18n="badge">✅ 100% Free for schools & students</div>
+    <div class="header-top">
+      <div class="header-brand">
+        <img src="logo.png" alt="Logo" class="logo-img"
+             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FCD34D%22/><text x=%2250%22 y=%2270%22 font-size=%2260%22 text-anchor=%22middle%22>🎓</text></svg>'">
+        <div>
+          <h1 id="appTitle">School Light Calculator</h1>
+          <p id="appSubtitle">Leer je school kennen — energie, CO₂, impact</p>
+        </div>
+      </div>
+      <div class="lang-buttons" id="langButtons"></div>
+    </div>
+    <div class="header-info">
+      <div class="header-info-item">🏫 <span id="hSchoolLabel">School:</span> <span class="value" id="hSchool">—</span></div>
+      <div class="header-info-item">📍 <span id="hAddressLabel">Locatie:</span> <span class="value" id="hAddress">—</span></div>
+      <div class="header-info-item">🚪 <span id="hBuildingLabel">Type:</span> <span class="value" id="hBuilding">—</span></div>
+      <div class="header-info-item">💡 <span id="hDimmableLabel">Dimbaar:</span> <span class="value" id="hDimmable">—</span></div>
     </div>
   </header>
 
-  <!-- School Year Banner -->
-  <div class="school-year-banner">
-    <span class="icon">📅</span>
-    <span data-i18n="schoolYearNote">A school year = 40 weeks</span>
-    <span class="icon">🎓</span>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-
-    <!-- LEFT: Input -->
-    <div class="section-card">
-      <h2 class="section-title">
-        <span class="icon">📝</span>
-        <span data-i18n="inputTitle">Enter your school data</span>
-      </h2>
-
-      <!-- Info -->
-      <div class="field">
-        <label><span>🏫</span> <span data-i18n="schoolName">School name</span></label>
-        <input type="text" id="schoolName" value="My School" placeholder="e.g. Sint-Jozef">
-      </div>
-
-      <div class="field">
-        <label><span>📍</span> <span data-i18n="location">City / Country</span></label>
-        <input type="text" id="location" value="Belgium" placeholder="e.g. Brussels">
-      </div>
-
-      <div class="field">
-        <label><span>👤</span> <span data-i18n="studentName">Your name (optional)</span></label>
-        <input type="text" id="studentName" placeholder="Optional">
-      </div>
-
-      <!-- Presets -->
-      <div class="field">
-        <label><span>⚡</span> <span data-i18n="lampType">Type of lamps used</span></label>
-        <div class="presets" id="presetsContainer"></div>
-      </div>
-
-      <!-- Sliders -->
-      <div class="slider-card">
-        <div class="slider-header">
-          <span class="slider-label"><span>🔢</span> <span data-i18n="numLamps">Number of lamps</span></span>
-          <span class="slider-value" id="numLampsVal">50</span>
+  <div class="content">
+    <aside class="left-panel">
+      <div class="section-title">📝 <span id="secGeneralInfo">Algemene gegevens</span></div>
+      <div class="info-block">
+        <div class="field-row">
+          <label id="lblSchoolName">Naam / school</label>
+          <input type="text" id="schoolName" value="Sint-Jozef School">
         </div>
-        <input type="range" id="numLamps" min="1" max="2000" value="50" step="1">
-        <div class="field-hint" data-i18n="numLampsHint">Count all lamps in the school</div>
-      </div>
-
-      <div class="slider-card">
-        <div class="slider-header">
-          <span class="slider-label"><span>⚡</span> <span data-i18n="powerPerLamp">Power per lamp (W)</span></span>
-          <span class="slider-value" id="powerVal">36</span>
+        <div class="field-row">
+          <label id="lblAddress">Adres / locatie</label>
+          <input type="text" id="addressName" value="Schoolstraat 12, 3500 Hasselt">
         </div>
-        <input type="range" id="power" min="5" max="200" value="36" step="1">
-      </div>
-
-      <div class="slider-card">
-        <div class="slider-header">
-          <span class="slider-label"><span>🕐</span> <span data-i18n="hoursPerDay">Hours per day</span></span>
-          <span class="slider-value" id="hoursVal">8</span>
+        <div class="field-row">
+          <label id="lblCountry">Land</label>
+          <input type="text" id="countryName" value="België">
         </div>
-        <input type="range" id="hours" min="1" max="24" value="8" step="1">
       </div>
 
-      <div class="slider-card">
-        <div class="slider-header">
-          <span class="slider-label"><span>📅</span> <span data-i18n="daysPerWeek">Days per week</span></span>
-          <span class="slider-value" id="daysVal">5</span>
+      <div class="section-title">🏫 <span id="secBuildingType">Type lokaal</span></div>
+      <div class="info-block">
+        <select id="buildingSelect" style="width:100%; padding:8px 10px; border:2px solid #A7F3D0; border-radius:6px; font-size:13px; font-family:inherit; color:var(--text); background:white; outline:none; margin-bottom:10px;"></select>
+        <div id="usageLabel" style="background:#D1FAE5; color:var(--primary); font-size:12px; font-weight:700; padding:8px 12px; border-radius:6px;"></div>
+      </div>
+
+      <div class="section-title">💡 <span id="secDimmable">Verlichtingstype</span></div>
+      <div class="info-block">
+        <div class="radio-group">
+          <label><input type="radio" name="dimmable" value="yes" checked> <span id="dimYesLabel">Ja, dimbaar</span></label>
+          <label><input type="radio" name="dimmable" value="no"> <span id="dimNoLabel">Nee, vast</span></label>
+          <label><input type="radio" name="dimmable" value="smart"> <span id="dimSmartLabel">Slimme sturing</span></label>
         </div>
-        <input type="range" id="days" min="1" max="7" value="5" step="1">
       </div>
 
-      <div class="field">
-        <label><span>💶</span> <span data-i18n="energyPrice">Energy price (€/kWh)</span></label>
-        <input type="number" id="energyPrice" value="0.32" step="0.01" min="0">
-        <div class="field-hint" data-i18n="energyPriceHint">Ask your teacher or check your energy bill</div>
+      <div class="section-title">👤 <span id="secContact">Contact</span></div>
+      <div class="info-block">
+        <div class="field-row">
+          <label id="lblTeacher">Leerkracht</label>
+          <input type="text" id="contactPerson" value="Mevr. Peeters">
+        </div>
+        <div class="field-row">
+          <label id="lblEmail">E-mail</label>
+          <input type="email" id="contactEmail" value="info@school.be">
+        </div>
       </div>
 
-      <div class="button-row">
-        <button class="btn btn-primary" id="calculateBtn">
-          <span>🧮</span> <span data-i18n="calculateBtn">Calculate now!</span>
-        </button>
-      </div>
-    </div>
+      <div class="disclaimer" id="disclaimer">🎓 Deze calculator is gemaakt voor scholen — 100% gratis</div>
+    </aside>
 
-    <!-- RIGHT: Results -->
-    <div class="section-card">
-      <h2 class="section-title">
-        <span class="icon">📊</span>
-        <span data-i18n="resultsTitle">Your school's results</span>
-      </h2>
+    <main class="right-panel">
+      <div class="main-title">🧮 <span id="mainTitle">Jaarlijks verbruik & kosten</span></div>
 
-      <!-- Energy Label -->
       <div class="energy-label-row">
-        <div class="label-pill" id="labelPill">A</div>
-        <div class="badge" id="lmwDisplay">100 lm/W</div>
-        <div class="badge" id="kelvinDisplay">4000 K</div>
+        <div class="label-pill" id="labelPill" style="background:#8BC34A;">A</div>
+        <div class="badge" id="dimmableIcon">💡 dimbaar</div>
+        <div class="badge lmw" id="lmwDisplay">150 lm/W</div>
+        <div class="badge lmw" id="kelvinDisplay">5000 K</div>
       </div>
 
-      <!-- Results -->
+      <div class="presets-label" id="presetsLabel">Snelle presets:</div>
+      <div class="presets" id="presetsContainer"></div>
+
+      <div class="price-box">
+        <div class="price-title" id="priceTitle">💶 Energieprijs (zelf invullen)</div>
+        <span class="unit">/kWh</span>
+        <select id="currencySelect">
+          <option value="€">€</option>
+          <option value="$">$</option>
+          <option value="£">£</option>
+          <option value="SEK">SEK</option>
+          <option value="CAD">CAD</option>
+          <option value="AUD">AUD</option>
+          <option value="JPY">JPY</option>
+          <option value="CNY">CNY</option>
+          <option value="ZAR">ZAR</option>
+        </select>
+        <input type="number" id="energyPrice" value="0.36" step="0.01" min="0" placeholder="0.00">
+      </div>
+
+      <div class="sliders-grid">
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="label">🔢 <span id="lblNumLuminaires">Aantal lampen</span></span>
+            <input type="number" id="numLuminairesInput" min="1" max="2000" value="150" class="num-input">
+          </div>
+          <input type="range" id="numLuminaires" min="1" max="2000" value="150" step="1">
+          <div class="display-value" id="dispNumLuminaires">150 stuks</div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="label">⚡ <span id="lblPowerPerLuminaire">Vermogen per lamp</span></span>
+            <span class="value" id="valPowerPerLuminaire">36</span>
+          </div>
+          <input type="range" id="powerPerLuminaire" min="5" max="200" value="36">
+          <div class="display-value" id="dispPowerPerLuminaire">36 W</div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="label">🕐 <span id="lblHoursPerDay">Uren per dag</span></span>
+            <span class="value" id="valHoursPerDay">8</span>
+          </div>
+          <input type="range" id="hoursPerDay" min="1" max="24" value="8">
+          <div class="display-value" id="dispHoursPerDay">8 uur</div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="label">📅 <span id="lblDaysPerWeek">Dagen per week</span></span>
+            <span class="value" id="valDaysPerWeek">5</span>
+          </div>
+          <input type="range" id="daysPerWeek" min="1" max="7" value="5">
+          <div class="display-value" id="dispDaysPerWeek">5 dagen</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span id="weeksLabel">📆 Weken/jaar: 40</span>
+        <span id="co2FactorLabel">📊 CO₂ factor: 0.5 kg/kWh</span>
+        <span class="school-note" id="schoolYearNote">🎓 Een schooljaar = 40 weken</span>
+      </div>
+
       <div class="results-grid">
         <div class="result-card primary">
-          <div class="result-label" data-i18n="totalPower">Total power</div>
-          <div class="result-value" id="totalPower">1.80</div>
-          <div class="result-unit">kW</div>
+          <div class="result-label">⚡ <span id="resTotalPowerLabel">Totaal vermogen</span></div>
+          <div class="result-value"><span class="num" id="resTotalPower">5.40</span><span class="unit">kW</span></div>
         </div>
         <div class="result-card">
-          <div class="result-label" data-i18n="yearlyEnergy">Energy per year</div>
-          <div class="result-value" id="yearlyEnergy">5,760</div>
-          <div class="result-unit">kWh</div>
+          <div class="result-label">📊 <span id="resConsumptionLabel">Jaarlijks verbruik</span></div>
+          <div class="result-value"><span class="num" id="resConsumption">8,640</span><span class="unit">kWh</span></div>
         </div>
         <div class="result-card">
-          <div class="result-label" data-i18n="yearlyCost">Cost per year</div>
-          <div class="result-value" id="yearlyCost">1,843</div>
-          <div class="result-unit">€</div>
+          <div class="result-label">💰 <span id="resCostLabel">Energiekosten / jaar</span></div>
+          <div class="result-value"><span class="num" id="resCost">3,110</span><span class="unit" id="resCostUnit">€</span></div>
         </div>
         <div class="result-card">
-          <div class="result-label" data-i18n="co2">CO₂ per year</div>
-          <div class="result-value" id="co2">2,880</div>
-          <div class="result-unit">kg</div>
+          <div class="result-label">🌿 <span id="resCo2Label">CO₂-uitstoot (kg)</span></div>
+          <div class="result-value"><span class="num" id="resCo2">4,320</span><span class="unit">kg</span></div>
         </div>
       </div>
 
-      <!-- CO₂ Visualization -->
-      <div class="co2-viz">
-        <h3><span>🌍</span> <span data-i18n="co2Equivalent">Your school's CO₂ equals...</span></h3>
-        <div class="co2-equivalents">
+      <div class="co2-visual">
+        <h3>🌍 Wat betekent deze CO₂-uitstoot?</h3>
+        <div class="co2-grid">
           <div class="co2-item">
-            <span class="emoji">🌳</span>
-            <div class="val" id="trees">131</div>
-            <div class="lbl" data-i18n="trees">trees needed</div>
+            <div class="co2-icon">🌳</div>
+            <div class="co2-value" id="treesValue">216</div>
+            <div class="co2-label">bomen nodig om te compenseren</div>
           </div>
           <div class="co2-item">
-            <span class="emoji">🚗</span>
-            <div class="val" id="km">16,000</div>
-            <div class="lbl" data-i18n="km">km by car</div>
+            <div class="co2-icon">🚗</div>
+            <div class="co2-value" id="carsValue">28,800</div>
+            <div class="co2-label">km autorijden</div>
           </div>
           <div class="co2-item">
-            <span class="emoji">✈️</span>
-            <div class="val" id="flights">5</div>
-            <div class="lbl" data-i18n="flights">flights Brussels-Barcelona</div>
+            <div class="co2-icon">✈️</div>
+            <div class="co2-value" id="flightsValue">3</div>
+            <div class="co2-label">vluchten Brussel-Rome</div>
+          </div>
+          <div class="co2-item">
+            <div class="co2-icon">📱</div>
+            <div class="co2-value" id="phonesValue">576,000</div>
+            <div class="co2-label">smartphones opladen</div>
           </div>
         </div>
       </div>
 
-      <!-- Tips -->
       <div class="tips-box">
-        <h4><span>💡</span> <span data-i18n="tipsTitle">Tips to save energy</span></h4>
+        <h3>💡 Tips om te besparen in jouw school</h3>
         <ul id="tipsList">
-          <li data-i18n="tip1">Turn off lights when leaving a room</li>
-          <li data-i18n="tip2">Replace old TL lamps with LED</li>
-          <li data-i18n="tip3">Use motion sensors in corridors</li>
-          <li data-i18n="tip4">Use daylight when possible</li>
+          <li>Vervang TL-buizen door LED — bespaart tot 40%</li>
+          <li>Plaats bewegingssensoren in gangen en toiletten</li>
+          <li>Gebruik daglicht waar mogelijk — doe lichten uit bij zon</li>
+          <li>Zet verlichting uit in lokalen die niet gebruikt worden</li>
         </ul>
       </div>
 
-      <!-- Buttons -->
       <div class="button-row">
-        <button class="btn btn-primary" id="pdfBtn">
-          <span>📄</span> <span data-i18n="downloadPdf">Download PDF Report</span>
-        </button>
+        <button class="btn btn-primary" id="btnUpdate">🔄 Update</button>
+        <button class="btn btn-success" id="btnPdf">📄 PDF Rapport</button>
+        <button class="btn btn-outline" id="btnPreview">👁 Voorbeeld</button>
+        <button class="btn btn-outline" id="btnReset">↺ Reset</button>
       </div>
-    </div>
 
+      <div class="footnote" id="footnote1"></div>
+      <div class="footnote" id="footnote2"></div>
+
+      <div style="margin-top:20px; text-align:center;">
+        <a href="https://ko-fi.com/groenklimaat" target="_blank" class="btn btn-kofi">
+          ☕ Steun de maker op Ko-fi
+        </a>
+      </div>
+    </main>
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <p data-i18n="footer1">Made with 💚 for schools, students and teachers around the world.</p>
-      <p data-i18n="footer2">Free to use — no data is collected, everything runs in your browser.</p>
-      <p>🌐 <strong>GroenKlimaat</strong> — <span data-i18n="footer3">A school year is 40 weeks</span></p>
-    </div>
-  </footer>
 </div>
 
-<!-- Buttons -->
-<button id="installBtn"><span>⬇</span> Install App</button>
-<a class="kofi-btn" href="https://ko-fi.com/groenklimaat" target="_blank">
-  <span>☕</span> <span data-i18n="support">Support us</span>
-</a>
+<button id="installBtn" title="Installeer deze app">⬇ Installeer App</button>
+
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">PDF Rapport Voorbeeld</h2>
+      <p id="modalDate">Gegenereerd op: —</p>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="btnCloseModal">Sluiten</button>
+      <button class="btn btn-success" id="btnDownloadModal">⬇ Download PDF</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============================================================
+// ============================================================================
 // TRANSLATIONS
-// ============================================================
-const TRANSLATIONS = {
-  en: {
-    title: "School Light Calculator",
-    subtitle: "Discover how much energy your school uses — and how to save it!",
-    badge: "✅ 100% Free for schools & students",
-    schoolYearNote: "A school year = 40 weeks",
-    inputTitle: "Enter your school data",
-    schoolName: "School name",
-    location: "City / Country",
-    studentName: "Your name (optional)",
-    lampType: "Type of lamps used",
-    numLamps: "Number of lamps",
-    numLampsHint: "Count all lamps in the school",
-    powerPerLamp: "Power per lamp (W)",
-    hoursPerDay: "Hours per day",
-    daysPerWeek: "Days per week",
-    energyPrice: "Energy price (€/kWh)",
-    energyPriceHint: "Ask your teacher or check your energy bill",
-    calculateBtn: "Calculate now!",
-    resultsTitle: "Your school's results",
-    totalPower: "Total power",
-    yearlyEnergy: "Energy per year",
-    yearlyCost: "Cost per year",
-    co2: "CO₂ per year",
-    co2Equivalent: "Your school's CO₂ equals...",
-    trees: "trees needed",
-    km: "km by car",
-    flights: "flights Brussels-Barcelona",
-    tipsTitle: "Tips to save energy",
-    tip1: "Turn off lights when leaving a room",
-    tip2: "Replace old TL lamps with LED",
-    tip3: "Use motion sensors in corridors",
-    tip4: "Use daylight when possible",
-    downloadPdf: "Download PDF Report",
-    footer1: "Made with 💚 for schools, students and teachers around the world.",
-    footer2: "Free to use — no data is collected, everything runs in your browser.",
-    footer3: "A school year is 40 weeks",
-    support: "Support us",
-    p1: "TL lamp (36W)", p2: "Old TL (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogen (50W)",
-    weeksPerYear: "Weeks per year"
-  },
+// ============================================================================
+var T = {
   nl: {
-    title: "School Licht Calculator",
-    subtitle: "Ontdek hoeveel energie jouw school verbruikt — en hoe je kunt besparen!",
-    badge: "✅ 100% Gratis voor scholen & leerlingen",
-    schoolYearNote: "Een schooljaar = 40 weken",
-    inputTitle: "Vul de gegevens van je school in",
-    schoolName: "Naam van de school",
-    location: "Stad / Land",
-    studentName: "Jouw naam (optioneel)",
-    lampType: "Type lampen",
-    numLamps: "Aantal lampen",
-    numLampsHint: "Tel alle lampen in de school",
-    powerPerLamp: "Vermogen per lamp (W)",
-    hoursPerDay: "Uren per dag",
-    daysPerWeek: "Dagen per week",
-    energyPrice: "Energieprijs (€/kWh)",
-    energyPriceHint: "Vraag je leerkracht of kijk op de energiefactuur",
-    calculateBtn: "Bereken nu!",
-    resultsTitle: "Resultaten van jouw school",
-    totalPower: "Totaal vermogen",
-    yearlyEnergy: "Verbruik per jaar",
-    yearlyCost: "Kost per jaar",
-    co2: "CO₂ per jaar",
-    co2Equivalent: "De CO₂ van jouw school is gelijk aan...",
-    trees: "bomen nodig",
-    km: "km met de auto",
-    flights: "vluchten Brussel-Barcelona",
-    tipsTitle: "Tips om energie te besparen",
-    tip1: "Doe het licht uit als je een lokaal verlaat",
-    tip2: "Vervang oude TL-lampen door LED",
-    tip3: "Gebruik bewegingssensoren in gangen",
-    tip4: "Gebruik daglicht wanneer het kan",
-    downloadPdf: "Download PDF Rapport",
-    footer1: "Met 💚 gemaakt voor scholen, leerlingen en leerkrachten wereldwijd.",
-    footer2: "Gratis te gebruiken — geen gegevens worden verzameld.",
-    footer3: "Een schooljaar is 40 weken",
-    support: "Steun ons",
-    p1: "TL-lamp (36W)", p2: "Oude TL (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogeen (50W)",
-    weeksPerYear: "Weken per jaar"
+    app_title: 'School Light Calculator', subtitle: 'Leer je school kennen — energie, CO₂, impact',
+    school: 'School', address: 'Locatie', building_type: 'Type', dimmable: 'Dimbaar',
+    general_info: 'Algemene gegevens', school_name: 'Naam / school',
+    address_label: 'Adres / locatie', country: 'Land', building_type_title: 'Type lokaal',
+    classroom: '🏫 Klaslokaal', gym: '🏋️ Gymzaal', hallway: '🚶 Gang / hal',
+    cafeteria: '🍽️ Refter', library: '📚 Bibliotheek', office: '🏢 Bureau',
+    toilets: '🚻 Toiletten', lab: '🔬 Labo', auditorium: '🎭 Auditorium',
+    usage_function: 'Gebruik: verlichting basis', dimmable_title: 'Verlichtingstype',
+    dimmable_yes: 'Ja, dimbaar', dimmable_no: 'Nee, vast', dimmable_smart: 'Slimme sturing',
+    contact: 'Contact', contact_person: 'Leerkracht', email: 'E-mail',
+    disclaimer: 'Deze calculator is gemaakt voor scholen — 100% gratis',
+    annual_title: 'Jaarlijks verbruik & kosten', energy_price: 'Energieprijs (zelf invullen)',
+    num_luminaires: 'Aantal lampen', power_per_luminaire: 'Vermogen per lamp',
+    hours_per_day: 'Uren per dag', days_per_week: 'Dagen per week',
+    pieces: 'stuks', hours: 'uur', days: 'dagen', weeks_per_year: 'Weken/jaar',
+    school_year_note: 'Een schooljaar = 40 weken', factor: 'factor',
+    total_power: 'Totaal vermogen', annual_consumption: 'Jaarlijks verbruik',
+    annual_cost: 'Energiekosten / jaar', co2_emission: 'CO₂-uitstoot (kg)',
+    update: 'Update', pdf_report: 'PDF Rapport', preview: 'Voorbeeld', reset: 'Reset',
+    quick_presets: 'Snelle presets',
+    led_premium: 'LED premium 150 lm/W | 5000K', led_standard: 'LED standaard 120 lm/W | 4000K',
+    tl: 'TL 90 lm/W | 3000K', cfl: 'CFL 60 lm/W | 2700K', halogen: 'Halogeen 20 lm/W | 2700K',
+    co2_title: 'Wat betekent deze CO₂-uitstoot?',
+    trees: 'bomen nodig om te compenseren', cars: 'km autorijden',
+    flights: 'vluchten Brussel-Rome', phones: 'smartphones opladen',
+    tips_title: 'Tips om te besparen in jouw school',
+    pdf_preview: 'PDF Rapport Voorbeeld', generated_on: 'Gegenereerd op',
+    close: 'Sluiten', download_pdf: 'Download PDF',
+    project_details: 'Schoolgegevens', lighting_installation: 'Verlichting',
+    usage_pattern: 'Gebruikspatroon', annual_results: 'Jaarlijkse resultaten',
+    pdf_school: 'School', pdf_address: 'Adres', pdf_contact: 'Contact',
+    pdf_country: 'Land', pdf_building_type: 'Type lokaal', pdf_dimmable: 'Dimbaar',
+    pdf_luminaires: 'Aantal lampen', pdf_power: 'Vermogen per lamp',
+    pdf_efficiency: 'Efficiëntie', pdf_color_temp: 'Kleurtemperatuur',
+    pdf_label: 'Energielabel', pdf_hours: 'Uren',
+    pdf_total_power: 'Totaal vermogen', pdf_consumption: 'Verbruik',
+    pdf_cost: 'Kosten', pdf_co2: 'CO₂-uitstoot', pdf_price: 'Energieprijs',
+    pdf_disclaimer: 'Verbruiksrapport — enkel ter informatie.',
+    energy_label_explanation: 'Energielabel op basis van lm/W: A++ (>140), A+ (120-140), A (100-120), B (85-100), C (70-85), D (55-70), E (40-55), F (25-40), G (<25).'
+  },
+  en: {
+    app_title: 'School Light Calculator', subtitle: 'Learn your school — energy, CO₂, impact',
+    school: 'School', address: 'Location', building_type: 'Type', dimmable: 'Dimmable',
+    general_info: 'General info', school_name: 'Name / school',
+    address_label: 'Address / location', country: 'Country', building_type_title: 'Room type',
+    classroom: '🏫 Classroom', gym: '🏋️ Gym', hallway: '🚶 Hallway',
+    cafeteria: '🍽️ Cafeteria', library: '📚 Library', office: '🏢 Office',
+    toilets: '🚻 Toilets', lab: '🔬 Lab', auditorium: '🎭 Auditorium',
+    usage_function: 'Usage: basic lighting', dimmable_title: 'Lighting type',
+    dimmable_yes: 'Yes, dimmable', dimmable_no: 'No, fixed', dimmable_smart: 'Smart control',
+    contact: 'Contact', contact_person: 'Teacher', email: 'Email',
+    disclaimer: 'This calculator is made for schools — 100% free',
+    annual_title: 'Annual consumption & costs', energy_price: 'Energy price (fill in yourself)',
+    num_luminaires: 'Number of lamps', power_per_luminaire: 'Power per lamp',
+    hours_per_day: 'Hours per day', days_per_week: 'Days per week',
+    pieces: 'pcs', hours: 'hours', days: 'days', weeks_per_year: 'Weeks/year',
+    school_year_note: 'A school year = 40 weeks', factor: 'factor',
+    total_power: 'Total power', annual_consumption: 'Annual consumption',
+    annual_cost: 'Energy cost / year', co2_emission: 'CO₂ emission (kg)',
+    update: 'Update', pdf_report: 'PDF Report', preview: 'Preview', reset: 'Reset',
+    quick_presets: 'Quick presets',
+    led_premium: 'LED premium 150 lm/W | 5000K', led_standard: 'LED standard 120 lm/W | 4000K',
+    tl: 'TL 90 lm/W | 3000K', cfl: 'CFL 60 lm/W | 2700K', halogen: 'Halogen 20 lm/W | 2700K',
+    co2_title: 'What does this CO₂ emission mean?',
+    trees: 'trees needed to compensate', cars: 'km of driving',
+    flights: 'flights Brussels-Rome', phones: 'smartphones charged',
+    tips_title: 'Tips to save energy in your school',
+    pdf_preview: 'PDF Report Preview', generated_on: 'Generated on',
+    close: 'Close', download_pdf: 'Download PDF',
+    project_details: 'School details', lighting_installation: 'Lighting',
+    usage_pattern: 'Usage pattern', annual_results: 'Annual results',
+    pdf_school: 'School', pdf_address: 'Address', pdf_contact: 'Contact',
+    pdf_country: 'Country', pdf_building_type: 'Room type', pdf_dimmable: 'Dimmable',
+    pdf_luminaires: 'Number of lamps', pdf_power: 'Power per lamp',
+    pdf_efficiency: 'Efficiency', pdf_color_temp: 'Color temperature',
+    pdf_label: 'Energy label', pdf_hours: 'Hours',
+    pdf_total_power: 'Total power', pdf_consumption: 'Consumption',
+    pdf_cost: 'Cost', pdf_co2: 'CO₂ emission', pdf_price: 'Energy price',
+    pdf_disclaimer: 'Consumption report — informational use only.',
+    energy_label_explanation: 'Energy label based on lm/W: A++ (>140), A+ (120-140), A (100-120), B (85-100), C (70-85), D (55-70), E (40-55), F (25-40), G (<25).'
   },
   de: {
-    title: "Schul-Licht-Rechner",
-    subtitle: "Finde heraus, wie viel Energie deine Schule verbraucht — und wie man spart!",
-    badge: "✅ 100% kostenlos für Schulen & Schüler",
-    schoolYearNote: "Ein Schuljahr = 40 Wochen",
-    inputTitle: "Schuldaten eingeben",
-    schoolName: "Name der Schule",
-    location: "Stadt / Land",
-    studentName: "Dein Name (optional)",
-    lampType: "Lampentyp",
-    numLamps: "Anzahl der Lampen",
-    numLampsHint: "Zähle alle Lampen in der Schule",
-    powerPerLamp: "Leistung pro Lampe (W)",
-    hoursPerDay: "Stunden pro Tag",
-    daysPerWeek: "Tage pro Woche",
-    energyPrice: "Energiepreis (€/kWh)",
-    energyPriceHint: "Frage deinen Lehrer oder prüfe die Rechnung",
-    calculateBtn: "Jetzt berechnen!",
-    resultsTitle: "Ergebnisse deiner Schule",
-    totalPower: "Gesamtleistung",
-    yearlyEnergy: "Verbrauch pro Jahr",
-    yearlyCost: "Kosten pro Jahr",
-    co2: "CO₂ pro Jahr",
-    co2Equivalent: "Die CO₂ deiner Schule entspricht...",
-    trees: "Bäume benötigt",
-    km: "km mit dem Auto",
-    flights: "Flüge Brüssel-Barcelona",
-    tipsTitle: "Tipps zum Energiesparen",
-    tip1: "Licht ausschalten beim Verlassen",
-    tip2: "Alte Leuchtstofflampen durch LED ersetzen",
-    tip3: "Bewegungsmelder in Fluren nutzen",
-    tip4: "Tageslicht nutzen",
-    downloadPdf: "PDF-Bericht herunterladen",
-    footer1: "Mit 💚 für Schulen, Schüler und Lehrer weltweit.",
-    footer2: "Kostenlos — keine Daten werden gesammelt.",
-    footer3: "Ein Schuljahr dauert 40 Wochen",
-    support: "Unterstütze uns",
-    p1: "Leuchtstofflampe (36W)", p2: "Alte TL (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogen (50W)",
-    weeksPerYear: "Wochen pro Jahr"
+    app_title: 'School Light Rechner', subtitle: 'Lerne deine Schule kennen — Energie, CO₂, Impact',
+    school: 'Schule', address: 'Standort', building_type: 'Typ', dimmable: 'Dimmbar',
+    general_info: 'Allgemeine Daten', school_name: 'Name / Schule',
+    address_label: 'Adresse / Standort', country: 'Land', building_type_title: 'Raumtyp',
+    classroom: '🏫 Klassenzimmer', gym: '🏋️ Turnhalle', hallway: '🚶 Flur',
+    cafeteria: '🍽️ Mensa', library: '📚 Bibliothek', office: '🏢 Büro',
+    toilets: '🚻 Toiletten', lab: '🔬 Labor', auditorium: '🎭 Aula',
+    usage_function: 'Nutzung: Grundbeleuchtung', dimmable_title: 'Beleuchtungstyp',
+    dimmable_yes: 'Ja, dimmbar', dimmable_no: 'Nein, fest', dimmable_smart: 'Smart-Steuerung',
+    contact: 'Kontakt', contact_person: 'Lehrer', email: 'E-Mail',
+    disclaimer: 'Dieser Rechner ist für Schulen — 100% kostenlos',
+    annual_title: 'Jährlicher Verbrauch & Kosten', energy_price: 'Energiepreis (selbst eingeben)',
+    num_luminaires: 'Anzahl Lampen', power_per_luminaire: 'Leistung pro Lampe',
+    hours_per_day: 'Stunden pro Tag', days_per_week: 'Tage pro Woche',
+    pieces: 'Stk', hours: 'Stunden', days: 'Tage', weeks_per_year: 'Wochen/Jahr',
+    school_year_note: 'Ein Schuljahr = 40 Wochen', factor: 'Faktor',
+    total_power: 'Gesamtleistung', annual_consumption: 'Jahresverbrauch',
+    annual_cost: 'Energiekosten / Jahr', co2_emission: 'CO₂-Emission (kg)',
+    update: 'Aktualisieren', pdf_report: 'PDF-Bericht', preview: 'Vorschau', reset: 'Zurücksetzen',
+    quick_presets: 'Schnellvoreinstellungen',
+    led_premium: 'LED Premium 150 lm/W | 5000K', led_standard: 'LED Standard 120 lm/W | 4000K',
+    tl: 'TL 90 lm/W | 3000K', cfl: 'CFL 60 lm/W | 2700K', halogen: 'Halogen 20 lm/W | 2700K',
+    co2_title: 'Was bedeutet diese CO₂-Emission?',
+    trees: 'Bäume zur Kompensation', cars: 'km Autofahren',
+    flights: 'Flüge Brüssel-Rom', phones: 'Smartphones aufladen',
+    tips_title: 'Tipps zum Energiesparen in deiner Schule',
+    pdf_preview: 'PDF-Bericht Vorschau', generated_on: 'Erstellt am',
+    close: 'Schließen', download_pdf: 'PDF herunterladen',
+    project_details: 'Schuldaten', lighting_installation: 'Beleuchtung',
+    usage_pattern: 'Nutzungsmuster', annual_results: 'Jährliche Ergebnisse',
+    pdf_school: 'Schule', pdf_address: 'Adresse', pdf_contact: 'Kontakt',
+    pdf_country: 'Land', pdf_building_type: 'Raumtyp', pdf_dimmable: 'Dimmbar',
+    pdf_luminaires: 'Anzahl Lampen', pdf_power: 'Leistung pro Lampe',
+    pdf_efficiency: 'Effizienz', pdf_color_temp: 'Farbtemperatur',
+    pdf_label: 'Energielabel', pdf_hours: 'Stunden',
+    pdf_total_power: 'Gesamtleistung', pdf_consumption: 'Verbrauch',
+    pdf_cost: 'Kosten', pdf_co2: 'CO₂-Emission', pdf_price: 'Energiepreis',
+    pdf_disclaimer: 'Verbrauchsbericht — nur zur Information.',
+    energy_label_explanation: 'Energielabel basierend auf lm/W: A++ (>140), A+ (120-140), A (100-120), B (85-100), C (70-85), D (55-70), E (40-55), F (25-40), G (<25).'
   },
   fr: {
-    title: "Calculatrice Lumière Scolaire",
-    subtitle: "Découvre combien d'énergie ton école consomme — et comment économiser !",
-    badge: "✅ 100% Gratuit pour les écoles & élèves",
-    schoolYearNote: "Une année scolaire = 40 semaines",
-    inputTitle: "Entre les données de ton école",
-    schoolName: "Nom de l'école",
-    location: "Ville / Pays",
-    studentName: "Ton nom (optionnel)",
-    lampType: "Type de lampes",
-    numLamps: "Nombre de lampes",
-    numLampsHint: "Compte toutes les lampes de l'école",
-    powerPerLamp: "Puissance par lampe (W)",
-    hoursPerDay: "Heures par jour",
-    daysPerWeek: "Jours par semaine",
-    energyPrice: "Prix énergie (€/kWh)",
-    energyPriceHint: "Demande à ton prof ou vérifie la facture",
-    calculateBtn: "Calcule maintenant !",
-    resultsTitle: "Résultats de ton école",
-    totalPower: "Puissance totale",
-    yearlyEnergy: "Énergie par an",
-    yearlyCost: "Coût par an",
-    co2: "CO₂ par an",
-    co2Equivalent: "Le CO₂ de ton école équivaut à...",
-    trees: "arbres nécessaires",
-    km: "km en voiture",
-    flights: "vols Bruxelles-Barcelone",
-    tipsTitle: "Astuces pour économiser",
-    tip1: "Éteins la lumière en sortant",
-    tip2: "Remplace les vieux TL par LED",
-    tip3: "Détecteurs de mouvement dans les couloirs",
-    tip4: "Utilise la lumière du jour",
-    downloadPdf: "Télécharger le rapport PDF",
-    footer1: "Fait avec 💚 pour les écoles, élèves et profs du monde.",
-    footer2: "Gratuit — aucune donnée collectée.",
-    footer3: "Une année scolaire dure 40 semaines",
-    support: "Soutiens-nous",
-    p1: "Lampe TL (36W)", p2: "Vieux TL (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogène (50W)",
-    weeksPerYear: "Semaines par an"
-  },
-  es: {
-    title: "Calculadora de Luz Escolar",
-    subtitle: "¡Descubre cuánta energía usa tu escuela — y cómo ahorrarla!",
-    badge: "✅ 100% Gratis para escuelas y estudiantes",
-    schoolYearNote: "Un año escolar = 40 semanas",
-    inputTitle: "Introduce los datos de tu escuela",
-    schoolName: "Nombre de la escuela",
-    location: "Ciudad / País",
-    studentName: "Tu nombre (opcional)",
-    lampType: "Tipo de lámparas",
-    numLamps: "Número de lámparas",
-    numLampsHint: "Cuenta todas las lámparas de la escuela",
-    powerPerLamp: "Potencia por lámpara (W)",
-    hoursPerDay: "Horas por día",
-    daysPerWeek: "Días por semana",
-    energyPrice: "Precio energía (€/kWh)",
-    energyPriceHint: "Pregunta a tu profe o mira la factura",
-    calculateBtn: "¡Calcular ahora!",
-    resultsTitle: "Resultados de tu escuela",
-    totalPower: "Potencia total",
-    yearlyEnergy: "Energía por año",
-    yearlyCost: "Coste por año",
-    co2: "CO₂ por año",
-    co2Equivalent: "El CO₂ de tu escuela equivale a...",
-    trees: "árboles necesarios",
-    km: "km en coche",
-    flights: "vuelos Bruselas-Barcelona",
-    tipsTitle: "Consejos para ahorrar",
-    tip1: "Apaga la luz al salir",
-    tip2: "Cambia los tubos viejos por LED",
-    tip3: "Sensores de movimiento en pasillos",
-    tip4: "Usa la luz natural",
-    downloadPdf: "Descargar informe PDF",
-    footer1: "Hecho con 💚 para escuelas, estudiantes y profesores del mundo.",
-    footer2: "Gratis — no se recogen datos.",
-    footer3: "Un año escolar son 40 semanas",
-    support: "Apóyanos",
-    p1: "Lámpara TL (36W)", p2: "TL viejo (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halógeno (50W)",
-    weeksPerYear: "Semanas por año"
-  },
-  it: {
-    title: "Calcolatore Luce Scolastica",
-    subtitle: "Scopri quanta energia consuma la tua scuola — e come risparmiare!",
-    badge: "✅ 100% Gratuito per scuole e studenti",
-    schoolYearNote: "Un anno scolastico = 40 settimane",
-    inputTitle: "Inserisci i dati della tua scuola",
-    schoolName: "Nome della scuola",
-    location: "Città / Paese",
-    studentName: "Il tuo nome (opzionale)",
-    lampType: "Tipo di lampade",
-    numLamps: "Numero di lampade",
-    numLampsHint: "Conta tutte le lampade della scuola",
-    powerPerLamp: "Potenza per lampada (W)",
-    hoursPerDay: "Ore al giorno",
-    daysPerWeek: "Giorni a settimana",
-    energyPrice: "Prezzo energia (€/kWh)",
-    energyPriceHint: "Chiedi al prof o controlla la bolletta",
-    calculateBtn: "Calcola ora!",
-    resultsTitle: "Risultati della tua scuola",
-    totalPower: "Potenza totale",
-    yearlyEnergy: "Energia all'anno",
-    yearlyCost: "Costo all'anno",
-    co2: "CO₂ all'anno",
-    co2Equivalent: "La CO₂ della tua scuola equivale a...",
-    trees: "alberi necessari",
-    km: "km in auto",
-    flights: "voli Bruxelles-Barcellona",
-    tipsTitle: "Consigli per risparmiare",
-    tip1: "Spegni la luce quando esci",
-    tip2: "Sostituisci i vecchi tubi con LED",
-    tip3: "Sensori di movimento nei corridoi",
-    tip4: "Usa la luce naturale",
-    downloadPdf: "Scarica rapporto PDF",
-    footer1: "Fatto con 💚 per scuole, studenti e insegnanti nel mondo.",
-    footer2: "Gratuito — nessun dato raccolto.",
-    footer3: "Un anno scolastico è di 40 settimane",
-    support: "Sostienici",
-    p1: "Lampada TL (36W)", p2: "Vecchio TL (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Alogena (50W)",
-    weeksPerYear: "Settimane all'anno"
-  },
-  no: {
-    title: "Skole Lys Kalkulator",
-    subtitle: "Finn ut hvor mye energi skolen din bruker — og hvordan du sparer!",
-    badge: "✅ 100% Gratis for skoler og elever",
-    schoolYearNote: "Et skoleår = 40 uker",
-    inputTitle: "Skriv inn skoledata",
-    schoolName: "Skolens navn",
-    location: "By / Land",
-    studentName: "Ditt navn (valgfritt)",
-    lampType: "Type lamper",
-    numLamps: "Antall lamper",
-    numLampsHint: "Tell alle lamper i skolen",
-    powerPerLamp: "Effekt per lampe (W)",
-    hoursPerDay: "Timer per dag",
-    daysPerWeek: "Dager per uke",
-    energyPrice: "Energipris (€/kWh)",
-    energyPriceHint: "Spør læreren eller sjekk regningen",
-    calculateBtn: "Beregn nå!",
-    resultsTitle: "Resultater for skolen din",
-    totalPower: "Total effekt",
-    yearlyEnergy: "Energi per år",
-    yearlyCost: "Kostnad per år",
-    co2: "CO₂ per år",
-    co2Equivalent: "Skolen din sin CO₂ tilsvarer...",
-    trees: "trær trengs",
-    km: "km med bil",
-    flights: "flyvninger Brussel-Barcelona",
-    tipsTitle: "Tips for å spare energi",
-    tip1: "Slå av lyset når du forlater rommet",
-    tip2: "Bytt gamle lysrør med LED",
-    tip3: "Bevegelsessensorer i korridorer",
-    tip4: "Bruk dagslys når mulig",
-    downloadPdf: "Last ned PDF-rapport",
-    footer1: "Laget med 💚 for skoler, elever og lærere verden over.",
-    footer2: "Gratis — ingen data samles inn.",
-    footer3: "Et skoleår er 40 uker",
-    support: "Støtt oss",
-    p1: "Lysrør (36W)", p2: "Gammelt lysrør (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogen (50W)",
-    weeksPerYear: "Uker per år"
-  },
-  sv: {
-    title: "Skol Ljus Kalkylator",
-    subtitle: "Upptäck hur mycket energi din skola använder — och hur du sparar!",
-    badge: "✅ 100% Gratis för skolor och elever",
-    schoolYearNote: "Ett läsår = 40 veckor",
-    inputTitle: "Ange dina skoldata",
-    schoolName: "Skolans namn",
-    location: "Stad / Land",
-    studentName: "Ditt namn (valfritt)",
-    lampType: "Typ av lampor",
-    numLamps: "Antal lampor",
-    numLampsHint: "Räkna alla lampor i skolan",
-    powerPerLamp: "Effekt per lampa (W)",
-    hoursPerDay: "Timmar per dag",
-    daysPerWeek: "Dagar per vecka",
-    energyPrice: "Energipris (€/kWh)",
-    energyPriceHint: "Fråga läraren eller kolla räkningen",
-    calculateBtn: "Beräkna nu!",
-    resultsTitle: "Resultat för din skola",
-    totalPower: "Total effekt",
-    yearlyEnergy: "Energi per år",
-    yearlyCost: "Kostnad per år",
-    co2: "CO₂ per år",
-    co2Equivalent: "Din skolas CO₂ motsvarar...",
-    trees: "träd behövs",
-    km: "km med bil",
-    flights: "flyg Bryssel-Barcelona",
-    tipsTitle: "Tips för att spara energi",
-    tip1: "Släck ljuset när du lämnar rummet",
-    tip2: "Byt gamla lysrör mot LED",
-    tip3: "Rörelsesensorer i korridorer",
-    tip4: "Använd dagsljus när möjligt",
-    downloadPdf: "Ladda ner PDF-rapport",
-    footer1: "Skapad med 💚 för skolor, elever och lärare världen över.",
-    footer2: "Gratis — ingen data samlas in.",
-    footer3: "Ett läsår är 40 veckor",
-    support: "Stöd oss",
-    p1: "Lysrör (36W)", p2: "Gammalt lysrör (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogen (50W)",
-    weeksPerYear: "Veckor per år"
-  },
-  pt: {
-    title: "Calculadora de Luz Escolar",
-    subtitle: "Descobre quanta energia a tua escola usa — e como poupar!",
-    badge: "✅ 100% Grátis para escolas e alunos",
-    schoolYearNote: "Um ano letivo = 40 semanas",
-    inputTitle: "Insere os dados da tua escola",
-    schoolName: "Nome da escola",
-    location: "Cidade / País",
-    studentName: "O teu nome (opcional)",
-    lampType: "Tipo de lâmpadas",
-    numLamps: "Número de lâmpadas",
-    numLampsHint: "Conta todas as lâmpadas da escola",
-    powerPerLamp: "Potência por lâmpada (W)",
-    hoursPerDay: "Horas por dia",
-    daysPerWeek: "Dias por semana",
-    energyPrice: "Preço energia (€/kWh)",
-    energyPriceHint: "Pergunta ao prof ou vê a fatura",
-    calculateBtn: "Calcula agora!",
-    resultsTitle: "Resultados da tua escola",
-    totalPower: "Potência total",
-    yearlyEnergy: "Energia por ano",
-    yearlyCost: "Custo por ano",
-    co2: "CO₂ por ano",
-    co2Equivalent: "A CO₂ da tua escola equivale a...",
-    trees: "árvores necessárias",
-    km: "km de carro",
-    flights: "voos Bruxelas-Barcelona",
-    tipsTitle: "Dicas para poupar energia",
-    tip1: "Apaga a luz ao sair",
-    tip2: "Substitui os tubos antigos por LED",
-    tip3: "Sensores de movimento nos corredores",
-    tip4: "Usa a luz natural",
-    downloadPdf: "Descarregar relatório PDF",
-    footer1: "Feito com 💚 para escolas, alunos e professores de todo o mundo.",
-    footer2: "Grátis — nenhum dado é recolhido.",
-    footer3: "Um ano letivo tem 40 semanas",
-    support: "Apoia-nos",
-    p1: "Lâmpada TL (36W)", p2: "TL antiga (58W)", p3: "LED (18W)", p4: "LED (10W)", p5: "Halogéneo (50W)",
-    weeksPerYear: "Semanas por ano"
+    app_title: 'Calculatrice École', subtitle: 'Découvre ton école — énergie, CO₂, impact',
+    school: 'École', address: 'Lieu', building_type: 'Type', dimmable: 'Variateur',
+    general_info: 'Données générales', school_name: 'Nom / école',
+    address_label: 'Adresse / lieu', country: 'Pays', building_type_title: 'Type de salle',
+    classroom: '🏫 Salle de classe', gym: '🏋️ Gymnase', hallway: '🚶 Couloir',
+    cafeteria: '🍽️ Cantine', library: '📚 Bibliothèque', office: '🏢 Bureau',
+    toilets: '🚻 Toilettes', lab: '🔬 Labo', auditorium: '🎭 Auditorium',
+    usage_function: 'Usage : éclairage de base', dimmable_title: 'Type d\'éclairage',
+    dimmable_yes: 'Oui, variable', dimmable_no: 'Non, fixe', dimmable_smart: 'Contrôle intelligent',
+    contact: 'Contact', contact_person: 'Enseignant', email: 'E-mail',
+    disclaimer: 'Cette calculatrice est pour les écoles — 100% gratuit',
+    annual_title: 'Consommation & coûts annuels', energy_price: 'Prix de l\'énergie (à saisir)',
+    num_luminaires: 'Nombre de lampes', power_per_luminaire: 'Puissance par lampe',
+    hours_per_day: 'Heures par jour', days_per_week: 'Jours par semaine',
+    pieces: 'pcs', hours: 'heures', days: 'jours', weeks_per_year: 'Semaines/an',
+    school_year_note: 'Une année scolaire = 40 semaines', factor: 'facteur',
+    total_power: 'Puissance totale', annual_consumption: 'Consommation annuelle',
+    annual_cost: 'Coût énergétique / an', co2_emission: 'Émission de CO₂ (kg)',
+    update: 'Mettre à jour', pdf_report: 'Rapport PDF', preview: 'Aperçu', reset: 'Réinitialiser',
+    quick_presets: 'Préréglages rapides',
+    led_premium: 'LED premium 150 lm/W | 5000K', led_standard: 'LED standard 120 lm/W | 4000K',
+    tl: 'TL 90 lm/W | 3000K', cfl: 'CFL 60 lm/W | 2700K', halogen: 'Halogène 20 lm/W | 2700K',
+    co2_title: 'Que signifie cette émission de CO₂ ?',
+    trees: 'arbres à planter', cars: 'km en voiture',
+    flights: 'vols Bruxelles-Rome', phones: 'smartphones chargés',
+    tips_title: 'Conseils pour économiser à l\'école',
+    pdf_preview: 'Aperçu du rapport PDF', generated_on: 'Généré le',
+    close: 'Fermer', download_pdf: 'Télécharger PDF',
+    project_details: 'Détails de l\'école', lighting_installation: 'Éclairage',
+    usage_pattern: 'Modèle d\'utilisation', annual_results: 'Résultats annuels',
+    pdf_school: 'École', pdf_address: 'Adresse', pdf_contact: 'Contact',
+    pdf_country: 'Pays', pdf_building_type: 'Type de salle', pdf_dimmable: 'Variateur',
+    pdf_luminaires: 'Nombre de lampes', pdf_power: 'Puissance par lampe',
+    pdf_efficiency: 'Efficacité', pdf_color_temp: 'Température de couleur',
+    pdf_label: 'Étiquette énergétique', pdf_hours: 'Heures',
+    pdf_total_power: 'Puissance totale', pdf_consumption: 'Consommation',
+    pdf_cost: 'Coût', pdf_co2: 'Émission de CO₂', pdf_price: 'Prix de l\'énergie',
+    pdf_disclaimer: 'Rapport de consommation — à titre informatif.',
+    energy_label_explanation: 'Étiquette énergétique basée sur lm/W : A++ (>140), A+ (120-140), A (100-120), B (85-100), C (70-85), D (55-70), E (40-55), F (25-40), G (<25).'
   }
 };
 
-const PRESETS = [
-  { lmw: 100, kelvin: 4000, key: 'p1', power: 36 },
-  { lmw: 65,  kelvin: 4000, key: 'p2', power: 58 },
-  { lmw: 200, kelvin: 4000, key: 'p3', power: 18 },
-  { lmw: 360, kelvin: 4000, key: 'p4', power: 10 },
-  { lmw: 20,  kelvin: 2700, key: 'p5', power: 50 }
+// Voeg es, it, pt, no, sv automatisch toe met EN als basis (of vul volledig in)
+T.es = Object.assign({}, T.en, { app_title: 'Calculadora Escolar', subtitle: 'Conoce tu escuela — energía, CO₂, impacto' });
+T.it = Object.assign({}, T.en, { app_title: 'Calcolatore Scolastico', subtitle: 'Conosci la tua scuola — energia, CO₂, impatto' });
+T.pt = Object.assign({}, T.en, { app_title: 'Calculadora Escolar', subtitle: 'Conhece a tua escola — energia, CO₂, impacto' });
+T.no = Object.assign({}, T.en, { app_title: 'Skole Lys Kalkulator', subtitle: 'Bli kjent med skolen din — energi, CO₂, påvirkning' });
+T.sv = Object.assign({}, T.en, { app_title: 'Skol Ljus Kalkylator', subtitle: 'Lär känna din skola — energi, CO₂, påverkan' });
+
+// ============================================================================
+// BUILDING TYPES
+// ============================================================================
+var BUILDING_TYPES = ['classroom','gym','hallway','cafeteria','library','office','toilets','lab','auditorium'];
+
+var ENERGY_LABELS = [
+  [140,'A++','#009688'],[120,'A+','#4CAF50'],[100,'A','#8BC34A'],
+  [85,'B','#CDDC39'],[70,'C','#FFC107'],[55,'D','#FF9800'],
+  [40,'E','#FF5722'],[25,'F','#F44336'],[0,'G','#9C27B0']
 ];
 
-const ENERGY_LABELS = [
-  [140, 'A++', '#059669'], [120, 'A+', '#10B981'], [100, 'A', '#34D399'],
-  [85, 'B', '#84CC16'], [70, 'C', '#FBBF24'], [55, 'D', '#FB923C'],
-  [40, 'E', '#F87171'], [25, 'F', '#EF4444'], [0, 'G', '#991B1B']
+var LANGUAGES = [['nl','NL'],['en','EN'],['de','DE'],['fr','FR'],['es','ES'],['it','IT'],['pt','PT'],['no','NO'],['sv','SV']];
+
+var PRESETS = [
+  {lmw:150, kelvin:5000, key:'led_premium'},
+  {lmw:120, kelvin:4000, key:'led_standard'},
+  {lmw:90, kelvin:3000, key:'tl'},
+  {lmw:60, kelvin:2700, key:'cfl'},
+  {lmw:20, kelvin:2700, key:'halogen'}
 ];
 
-let currentLang = 'en';
-let currentKelvin = 4000;
-let activePreset = 0;
+var currentLang = 'nl';
+var activePreset = 0;
+var currentKelvin = 5000;
 
 function $(id) { return document.getElementById(id); }
 
-// ============================================================
+// ============================================================================
 // INIT
-// ============================================================
+// ============================================================================
 function init() {
+  populateBuildingSelect();
   buildLangButtons();
   buildPresets();
   bindEvents();
-  setLanguage('en');
+  setLanguage('nl');
   calculate();
   registerServiceWorker();
   setupInstallPrompt();
 }
 
-function buildLangButtons() {
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      setLanguage(this.getAttribute('data-lang'));
-    });
+function populateBuildingSelect() {
+  var sel = $('buildingSelect');
+  sel.innerHTML = '';
+  BUILDING_TYPES.forEach(function(bt) {
+    var opt = document.createElement('option');
+    opt.value = bt;
+    opt.textContent = bt;
+    sel.appendChild(opt);
   });
 }
 
-function buildPresets() {
-  const container = $('presetsContainer');
+function buildLangButtons() {
+  var container = $('langButtons');
   container.innerHTML = '';
-  PRESETS.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'preset-btn' + (i === 0 ? ' active' : '');
-    btn.dataset.index = i;
-    btn.addEventListener('click', () => setPreset(p, i));
+  LANGUAGES.forEach(function(item) {
+    var btn = document.createElement('button');
+    btn.className = 'lang-btn';
+    btn.textContent = item[1];
+    btn.dataset.lang = item[0];
+    btn.addEventListener('click', function() { setLanguage(item[0]); });
     container.appendChild(btn);
   });
 }
 
-function setPreset(preset, index) {
-  $('power').value = preset.power;
-  currentKelvin = preset.kelvin;
+function buildPresets() {
+  var container = $('presetsContainer');
+  container.innerHTML = '';
+  PRESETS.forEach(function(p, i) {
+    var btn = document.createElement('button');
+    btn.className = 'preset-btn' + (i === activePreset ? ' active' : '');
+    btn.dataset.index = i;
+    btn.addEventListener('click', function() { setLumenWatt(p.lmw, p.kelvin, i); });
+    container.appendChild(btn);
+  });
+}
+
+function bindEvents() {
+  $('schoolName').addEventListener('input', updateHeaderInfo);
+  $('addressName').addEventListener('input', updateHeaderInfo);
+  $('countryName').addEventListener('input', updateHeaderInfo);
+  $('buildingSelect').addEventListener('change', function() {
+    updateHeaderInfo();
+    updateUsageLabel();
+  });
+  var radios = document.querySelectorAll('input[name="dimmable"]');
+  for (var i = 0; i < radios.length; i++) {
+    radios[i].addEventListener('change', updateHeaderInfo);
+  }
+  $('currencySelect').addEventListener('change', calculate);
+  $('energyPrice').addEventListener('input', calculate);
+  ['numLuminaires','powerPerLuminaire','hoursPerDay','daysPerWeek'].forEach(function(id) {
+    $(id).addEventListener('input', onSliderChange);
+  });
+  $('numLuminairesInput').addEventListener('input', function() {
+    var val = parseInt($('numLuminairesInput').value);
+    if (isNaN(val)) return;
+    val = Math.max(1, Math.min(2000, val));
+    $('numLuminaires').value = val;
+    onSliderChange();
+  });
+  $('numLuminairesInput').addEventListener('blur', function() {
+    var val = parseInt($('numLuminairesInput').value) || 1;
+    val = Math.max(1, Math.min(2000, val));
+    $('numLuminairesInput').value = val;
+    $('numLuminaires').value = val;
+    onSliderChange();
+  });
+  $('btnUpdate').addEventListener('click', calculate);
+  $('btnPdf').addEventListener('click', generatePdf);
+  $('btnPreview').addEventListener('click', previewPdf);
+  $('btnReset').addEventListener('click', resetDefault);
+  $('btnCloseModal').addEventListener('click', function() { $('previewModal').classList.remove('open'); });
+  $('previewModal').addEventListener('click', function(e) {
+    if (e.target === $('previewModal')) $('previewModal').classList.remove('open');
+  });
+  $('btnDownloadModal').addEventListener('click', function() {
+    $('previewModal').classList.remove('open');
+    generatePdf();
+  });
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  var t = T[lang];
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  $('appTitle').textContent = t.app_title;
+  $('appSubtitle').textContent = t.subtitle;
+  $('hSchoolLabel').textContent = t.school + ':';
+  $('hAddressLabel').textContent = t.address + ':';
+  $('hBuildingLabel').textContent = t.building_type + ':';
+  $('hDimmableLabel').textContent = t.dimmable + ':';
+
+  $('secGeneralInfo').textContent = t.general_info;
+  $('secBuildingType').textContent = t.building_type_title;
+  $('secDimmable').textContent = t.dimmable_title;
+  $('secContact').textContent = t.contact;
+
+  $('lblSchoolName').textContent = t.school_name;
+  $('lblAddress').textContent = t.address_label;
+  $('lblCountry').textContent = t.country;
+  $('lblTeacher').textContent = t.contact_person;
+  $('lblEmail').textContent = t.email;
+
+  $('dimYesLabel').textContent = t.dimmable_yes;
+  $('dimNoLabel').textContent = t.dimmable_no;
+  $('dimSmartLabel').textContent = t.dimmable_smart;
+
+  $('disclaimer').textContent = '🎓 ' + t.disclaimer;
+  $('mainTitle').textContent = t.annual_title;
+  $('presetsLabel').textContent = t.quick_presets + ':';
+
+  document.querySelectorAll('.preset-btn').forEach(function(btn, i) {
+    btn.textContent = t[PRESETS[i].key];
+  });
+
+  $('priceTitle').textContent = '💶 ' + t.energy_price;
+  $('lblNumLuminaires').textContent = t.num_luminaires;
+  $('lblPowerPerLuminaire').textContent = t.power_per_luminaire;
+  $('lblHoursPerDay').textContent = t.hours_per_day;
+  $('lblDaysPerWeek').textContent = t.days_per_week;
+  $('weeksLabel').textContent = '📆 ' + t.weeks_per_year + ': 40';
+  $('schoolYearNote').textContent = '🎓 ' + t.school_year_note;
+  $('co2FactorLabel').textContent = '📊 CO₂ ' + t.factor + ': 0.5 kg/kWh';
+
+  $('resTotalPowerLabel').textContent = t.total_power;
+  $('resConsumptionLabel').textContent = t.annual_consumption;
+  $('resCostLabel').textContent = t.annual_cost;
+  $('resCo2Label').textContent = t.co2_emission;
+
+  $('btnUpdate').textContent = '🔄 ' + t.update;
+  $('btnPdf').textContent = '📄 ' + t.pdf_report;
+  $('btnPreview').textContent = '👁 ' + t.preview;
+  $('btnReset').textContent = '↺ ' + t.reset;
+
+  $('footnote1').textContent = '📏 ' + t.energy_label_explanation;
+  $('modalTitle').textContent = t.pdf_preview;
+
+  updateBuildingSelect();
+  updateUsageLabel();
+  updateHeaderInfo();
+  onSliderChange();
+}
+
+function updateBuildingSelect() {
+  var t = T[currentLang];
+  var sel = $('buildingSelect');
+  var current = sel.value || 'classroom';
+  sel.innerHTML = '';
+  BUILDING_TYPES.forEach(function(bt) {
+    var opt = document.createElement('option');
+    opt.value = bt;
+    opt.textContent = t[bt] || bt;
+    sel.appendChild(opt);
+  });
+  sel.value = current;
+}
+
+function updateUsageLabel() {
+  $('usageLabel').textContent = '🔧 ' + T[currentLang].usage_function;
+}
+
+function updateHeaderInfo() {
+  var t = T[currentLang];
+  $('hSchool').textContent = $('schoolName').value || '—';
+  $('hAddress').textContent = $('addressName').value || '—';
+  var bt = $('buildingSelect').value || 'classroom';
+  var btText = t[bt] || bt;
+  $('hBuilding').textContent = btText.replace(/^[^\s]+\s/, '');
+  var dim = document.querySelector('input[name="dimmable"]:checked').value;
+  var dimMap = { yes: 'dimmable_yes', no: 'dimmable_no', smart: 'dimmable_smart' };
+  var dimText = t[dimMap[dim]];
+  $('hDimmable').textContent = dimText.replace(/^[^\s]+\s/, '');
+  if (dim === 'yes') { $('dimmableIcon').textContent = '💡 ' + t.dimmable; }
+  else if (dim === 'smart') { $('dimmableIcon').textContent = '📶 ' + t.dimmable_smart; }
+  else { $('dimmableIcon').textContent = '⭕ ' + t.dimmable_no; }
+}
+
+function onSliderChange() {
+  var t = T[currentLang];
+  var sliders = [
+    { id: 'numLuminaires', dispId: 'dispNumLuminaires', unit: 'pieces' },
+    { id: 'powerPerLuminaire', dispId: 'dispPowerPerLuminaire', unit: 'W' },
+    { id: 'hoursPerDay', dispId: 'dispHoursPerDay', unit: 'hours' },
+    { id: 'daysPerWeek', dispId: 'dispDaysPerWeek', unit: 'days' }
+  ];
+  sliders.forEach(function(s) {
+    var val = parseInt($(s.id).value);
+    var unitText = (s.unit === 'W') ? 'W' : (t[s.unit] || s.unit);
+    $(s.dispId).textContent = val + ' ' + unitText;
+  });
+  if ($('valPowerPerLuminaire')) $('valPowerPerLuminaire').textContent = $('powerPerLuminaire').value;
+  if ($('valHoursPerDay')) $('valHoursPerDay').textContent = $('hoursPerDay').value;
+  if ($('valDaysPerWeek')) $('valDaysPerWeek').textContent = $('daysPerWeek').value;
+  if ($('numLuminairesInput')) $('numLuminairesInput').value = $('numLuminaires').value;
+  calculate();
+}
+
+function setLumenWatt(lmw, kelvin, index) {
+  var newPower = Math.round(3600 / lmw);
+  newPower = Math.max(5, Math.min(200, newPower));
+  $('powerPerLuminaire').value = newPower;
+  currentKelvin = kelvin;
   activePreset = index;
-  document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+  document.querySelectorAll('.preset-btn').forEach(function(btn, i) {
     btn.classList.toggle('active', i === index);
   });
   onSliderChange();
 }
 
-function bindEvents() {
-  ['numLamps', 'power', 'hours', 'days'].forEach(id => {
-    $(id).addEventListener('input', onSliderChange);
-  });
-  $('energyPrice').addEventListener('input', calculate);
-  $('calculateBtn').addEventListener('click', calculate);
-  $('pdfBtn').addEventListener('click', generatePdf);
-}
-
-function onSliderChange() {
-  $('numLampsVal').textContent = $('numLamps').value;
-  $('powerVal').textContent = $('power').value;
-  $('hoursVal').textContent = $('hours').value;
-  $('daysVal').textContent = $('days').value;
-  calculate();
-}
-
-function setLanguage(lang) {
-  currentLang = lang;
-  const t = TRANSLATIONS[lang];
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
-
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (t[key]) el.textContent = t[key];
-  });
-
-  document.title = t.title + ' | GroenKlimaat';
-
-  // Update presets
-  document.querySelectorAll('.preset-btn').forEach((btn, i) => {
-    btn.textContent = t[PRESETS[i].key];
-  });
-
-  calculate();
-}
-
-// ============================================================
-// CALCULATE
-// ============================================================
 function calculate() {
-  const numLamps = parseInt($('numLamps').value) || 0;
-  const power = parseInt($('power').value) || 0;
-  const hours = parseInt($('hours').value) || 0;
-  const days = parseInt($('days').value) || 0;
-  const weeks = 40; // School year!
-  const price = parseFloat($('energyPrice').value) || 0.32;
+  var num = parseInt($('numLuminaires').value) || 0;
+  var power = parseInt($('powerPerLuminaire').value) || 0;
+  var hours = parseInt($('hoursPerDay').value) || 0;
+  var days = parseInt($('daysPerWeek').value) || 0;
+  var weeks = 40;
+  var totalPowerKw = (num * power) / 1000;
+  var kwh = totalPowerKw * hours * days * weeks;
+  var price = parseFloat($('energyPrice').value) || 0.36;
+  var cost = kwh * price;
+  var co2 = kwh * 0.5;
 
-  const totalPowerKw = (numLamps * power) / 1000;
-  const yearlyHours = hours * days * weeks;
-  const kwh = totalPowerKw * yearlyHours;
-  const cost = kwh * price;
-  const co2 = kwh * 0.5;
+  function fmt(v) {
+    var s = v < 1000 ? v.toFixed(2) : Math.round(v).toLocaleString('en-US');
+    if (['nl','de','fr','es','pt','it','no','sv'].indexOf(currentLang) !== -1) {
+      s = s.replace(/,/g, 'X').replace(/\./g, ',').replace(/X/g, '.');
+    }
+    return s;
+  }
 
-  const fmt = (v) => Math.round(v).toLocaleString('en-US');
-
-  $('totalPower').textContent = totalPowerKw.toFixed(2);
-  $('yearlyEnergy').textContent = fmt(kwh);
-  $('yearlyCost').textContent = fmt(cost);
-  $('co2').textContent = fmt(co2);
+  $('resTotalPower').textContent = fmt(totalPowerKw);
+  $('resConsumption').textContent = fmt(Math.round(kwh));
+  $('resCost').textContent = fmt(Math.round(cost));
+  $('resCo2').textContent = fmt(Math.round(co2));
+  $('resCostUnit').textContent = $('currencySelect').value;
 
   // CO₂ visualisatie
-  const trees = Math.round(co2 / 22);      // 1 boom = ~22 kg CO₂/jaar
-  const km = Math.round(co2 / 0.18);        // ~180g CO₂ per km
-  const flights = (co2 / 600).toFixed(1);   // ~600 kg per vlucht
+  var trees = Math.round(co2 / 20);          // ~20 kg CO2 per boom per jaar
+  var cars = Math.round(co2 / 0.15);          // ~150g CO2 per km
+  var flights = Math.round(co2 / 1500);       // ~1500 kg CO2 per vlucht
+  var phones = Math.round(co2 / 0.0075);      // ~7.5g CO2 per smartphone charge
+  $('treesValue').textContent = trees.toLocaleString('en-US');
+  $('carsValue').textContent = cars.toLocaleString('en-US');
+  $('flightsValue').textContent = flights;
+  $('phonesValue').textContent = phones.toLocaleString('en-US');
 
-  $('trees').textContent = fmt(trees);
-  $('km').textContent = fmt(km);
-  $('flights').textContent = flights;
-
-  // Energy label
-  const lmw = power > 0 ? Math.round(3600 / power) : 0;
+  var lmw = power > 0 ? Math.round(3600 / power) : 0;
   $('lmwDisplay').textContent = lmw + ' lm/W';
   $('kelvinDisplay').textContent = currentKelvin + ' K';
 
-  for (const [threshold, label, color] of ENERGY_LABELS) {
-    if (lmw >= threshold) {
-      $('labelPill').textContent = label;
-      $('labelPill').style.background = color;
+  for (var i = 0; i < ENERGY_LABELS.length; i++) {
+    if (lmw >= ENERGY_LABELS[i][0]) {
+      $('labelPill').textContent = ENERGY_LABELS[i][1];
+      $('labelPill').style.background = ENERGY_LABELS[i][2];
       break;
     }
   }
 }
 
-// ============================================================
-// PDF
-// ============================================================
-function generatePdf() {
-  const t = TRANSLATIONS[currentLang];
-  const schoolName = $('schoolName').value;
-  const location = $('location').value;
-  const studentName = $('studentName').value || '—';
-
-  const win = window.open('', '_blank');
-  if (!win) { alert('Please allow pop-ups'); return; }
-
-  const html = `
-    <!DOCTYPE html>
-    <html><head><meta charset="UTF-8">
-    <title>School Light Report - ${schoolName}</title>
-    <style>
-      body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; color: #0F172A; }
-      h1 { color: #10B981; font-size: 28px; margin-bottom: 5px; }
-      h2 { color: #0F172A; font-size: 16px; margin-top: 25px; border-bottom: 2px solid #10B981; padding-bottom: 5px; }
-      .subtitle { color: #666; font-size: 13px; margin-bottom: 25px; }
-      table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-      td { padding: 10px; border-bottom: 1px solid #E0E0E0; font-size: 14px; }
-      td:first-child { color: #666; width: 40%; }
-      td:last-child { font-weight: 700; color: #0F172A; }
-      .highlight { background: #D1FAE5; padding: 15px; border-radius: 8px; margin: 15px 0; }
-      .footer { margin-top: 40px; font-size: 11px; color: #999; text-align: center; }
-    </style></head><body>
-    <h1>🎓 School Light Calculator</h1>
-    <div class="subtitle">${new Date().toLocaleDateString()}</div>
-    
-    <h2>📋 School Info</h2>
-    <table>
-      <tr><td>School</td><td>${schoolName}</td></tr>
-      <tr><td>Location</td><td>${location}</td></tr>
-      <tr><td>Student</td><td>${studentName}</td></tr>
-    </table>
-    
-    <h2>💡 Lighting Setup</h2>
-    <table>
-      <tr><td>Number of lamps</td><td>${$('numLamps').value}</td></tr>
-      <tr><td>Power per lamp</td><td>${$('power').value} W</td></tr>
-      <tr><td>Hours per day</td><td>${$('hours').value}</td></tr>
-      <tr><td>Days per week</td><td>${$('days').value}</td></tr>
-      <tr><td>School year</td><td>40 weeks</td></tr>
-    </table>
-    
-    <h2>📊 Results</h2>
-    <div class="highlight">
-      <table>
-        <tr><td>Total power</td><td>${$('totalPower').textContent} kW</td></tr>
-        <tr><td>Energy per year</td><td>${$('yearlyEnergy').textContent} kWh</td></tr>
-        <tr><td>Cost per year</td><td>€ ${$('yearlyCost').textContent}</td></tr>
-        <tr><td>CO₂ per year</td><td>${$('co2').textContent} kg</td></tr>
-      </table>
-    </div>
-    
-    <h2>🌍 CO₂ Equivalent</h2>
-    <p>🌳 <strong>${$('trees').textContent}</strong> trees needed to compensate</p>
-    <p>🚗 <strong>${$('km').textContent}</strong> km by car</p>
-    <p>✈️ <strong>${$('flights').textContent}</strong> flights Brussels-Barcelona</p>
-    
-    <h2>💡 Tips</h2>
-    <ul>
-      <li>${t.tip1}</li>
-      <li>${t.tip2}</li>
-      <li>${t.tip3}</li>
-      <li>${t.tip4}</li>
-    </ul>
-    
-    <div class="footer">
-      🎓 School Light Calculator — Made with 💚 by GroenKlimaat<br>
-      www.magicwhale.eu
-    </div>
-    </body></html>
-  `;
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => win.print(), 500);
+function resetDefault() {
+  $('schoolName').value = 'Sint-Jozef School';
+  $('addressName').value = 'Schoolstraat 12, 3500 Hasselt';
+  $('countryName').value = 'België';
+  $('contactPerson').value = 'Mevr. Peeters';
+  $('contactEmail').value = 'info@school.be';
+  $('buildingSelect').value = 'classroom';
+  document.querySelector('input[name="dimmable"][value="yes"]').checked = true;
+  $('energyPrice').value = 0.36;
+  $('currencySelect').value = '€';
+  $('numLuminaires').value = 150;
+  $('numLuminairesInput').value = 150;
+  $('powerPerLuminaire').value = 36;
+  $('hoursPerDay').value = 8;
+  $('daysPerWeek').value = 5;
+  setLumenWatt(150, 5000, 0);
+  updateHeaderInfo();
+  calculate();
 }
 
-// ============================================================
-// PWA
-// ============================================================
+function getReportData() {
+  var t = T[currentLang];
+  var bt = $('buildingSelect').value || 'classroom';
+  var buildingText = t[bt] || bt;
+  var dim = document.querySelector('input[name="dimmable"]:checked').value;
+  var dimMap = { yes: 'dimmable_yes', no: 'dimmable_no', smart: 'dimmable_smart' };
+  return {
+    appTitle: t.app_title,
+    generatedOn: new Date().toLocaleDateString('en-GB').replace(/\//g, '-'),
+    school: $('schoolName').value,
+    address: $('addressName').value,
+    contact: $('contactPerson').value + ' (' + $('contactEmail').value + ')',
+    country: $('countryName').value,
+    buildingType: buildingText,
+    dimmable: t[dimMap[dim]],
+    numLuminaires: $('numLuminaires').value,
+    power: $('powerPerLuminaire').value,
+    lmw: $('lmwDisplay').textContent,
+    kelvin: $('kelvinDisplay').textContent,
+    energyLabel: $('labelPill').textContent,
+    hours: $('hoursPerDay').value,
+    days: $('daysPerWeek').value,
+    totalPower: $('resTotalPower').textContent,
+    consumption: $('resConsumption').textContent,
+    cost: $('resCost').textContent,
+    currency: $('currencySelect').value,
+    co2: $('resCo2').textContent,
+    price: $('energyPrice').value,
+    t: t
+  };
+}
+
+function previewPdf() {
+  var data = getReportData();
+  var t = data.t;
+  $('modalDate').textContent = t.generated_on + ': ' + data.generatedOn;
+  var html = '';
+  function addSection(title) { html += '<div class="modal-section-title">' + title + '</div>'; }
+  function addRow(label, value) {
+    html += '<div class="modal-row"><span class="label">' + label + '</span><span class="value">' + value + '</span></div>';
+  }
+  addSection('📋 ' + t.project_details);
+  addRow(t.pdf_school, data.school);
+  addRow(t.pdf_address, data.address);
+  addRow(t.pdf_contact, data.contact);
+  addRow(t.pdf_country, data.country);
+  addRow(t.pdf_building_type, data.buildingType);
+  addRow(t.pdf_dimmable, data.dimmable);
+  addSection('💡 ' + t.lighting_installation);
+  addRow(t.pdf_luminaires, data.numLuminaires + ' ' + t.pieces);
+  addRow(t.pdf_power, data.power + ' W');
+  addRow(t.pdf_efficiency, data.lmw);
+  addRow(t.pdf_color_temp, data.kelvin);
+  addRow(t.pdf_label, data.energyLabel);
+  addSection('⏱️ ' + t.usage_pattern);
+  addRow(t.pdf_hours, data.hours + ' h/day, ' + data.days + ' days/week, 40 weeks/year');
+  addSection('📊 ' + t.annual_results);
+  addRow(t.pdf_total_power, data.totalPower + ' kW');
+  addRow(t.pdf_consumption, data.consumption + ' kWh');
+  addRow(t.pdf_cost, data.cost + ' ' + data.currency);
+  addRow(t.pdf_co2, data.co2 + ' kg');
+  addRow(t.pdf_price, data.price + ' ' + data.currency + '/kWh');
+  html += '<p style="margin-top:15px;font-size:12px;color:#999;font-style:italic;">' + t.pdf_disclaimer + '</p>';
+  $('modalBody').innerHTML = html;
+  $('previewModal').classList.add('open');
+}
+
+function generatePdf() {
+  var data = getReportData();
+  var t = data.t;
+  var printWindow = window.open('', '_blank');
+  if (!printWindow) { alert('Please allow pop-ups.'); return; }
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + data.appTitle + '</title>';
+  html += '<style>body{font-family:Segoe UI,Arial,sans-serif;margin:30px;color:#065F46;}';
+  html += 'h1{color:#065F46;font-size:26px;margin-bottom:5px;}';
+  html += '.subtitle{color:#666;font-size:13px;margin-bottom:25px;}';
+  html += 'h2{color:#065F46;font-size:16px;margin-top:25px;margin-bottom:10px;border-bottom:2px solid #10B981;padding-bottom:5px;}';
+  html += 'table{width:100%;border-collapse:collapse;margin-bottom:10px;}';
+  html += 'td{padding:6px 10px;border-bottom:1px solid #E0E0E0;font-size:13px;}';
+  html += 'td:first-child{color:#666;width:40%;}td:last-child{font-weight:600;}';
+  html += '.disclaimer{margin-top:30px;font-size:11px;color:#999;font-style:italic;}';
+  html += '@media print{body{margin:15mm;}}</style></head><body>';
+  html += '<h1>🎓 ' + data.appTitle + '</h1>';
+  html += '<div class="subtitle">' + t.generated_on + ': ' + data.generatedOn + '</div>';
+  function addSection(title) { html += '<h2>' + title + '</h2><table>'; }
+  function addRow(label, value) { html += '<tr><td>' + label + '</td><td>' + value + '</td></tr>'; }
+  function closeTable() { html += '</table>'; }
+  addSection('📋 ' + t.project_details);
+  addRow(t.pdf_school, data.school);
+  addRow(t.pdf_address, data.address);
+  addRow(t.pdf_contact, data.contact);
+  addRow(t.pdf_country, data.country);
+  addRow(t.pdf_building_type, data.buildingType);
+  addRow(t.pdf_dimmable, data.dimmable);
+  closeTable();
+  addSection('💡 ' + t.lighting_installation);
+  addRow(t.pdf_luminaires, data.numLuminaires + ' ' + t.pieces);
+  addRow(t.pdf_power, data.power + ' W');
+  addRow(t.pdf_efficiency, data.lmw);
+  addRow(t.pdf_color_temp, data.kelvin);
+  addRow(t.pdf_label, data.energyLabel);
+  closeTable();
+  addSection('⏱️ ' + t.usage_pattern);
+  addRow(t.pdf_hours, data.hours + ' h/day, ' + data.days + ' days/week, 40 weeks/year');
+  closeTable();
+  addSection('📊 ' + t.annual_results);
+  addRow(t.pdf_total_power, data.totalPower + ' kW');
+  addRow(t.pdf_consumption, data.consumption + ' kWh');
+  addRow(t.pdf_cost, data.cost + ' ' + data.currency);
+  addRow(t.pdf_co2, data.co2 + ' kg');
+  addRow(t.pdf_price, data.price + ' ' + data.currency + '/kWh');
+  closeTable();
+  html += '<div class="disclaimer">' + t.pdf_disclaimer + '</div></body></html>';
+  printWindow.document.write(html);
+  printWindow.document.close();
+  setTimeout(function() { printWindow.print(); }, 500);
+}
+
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
-  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
-  window.addEventListener('load', () => {
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+  window.addEventListener('load', function() {
     navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('✅ SW:', reg.scope))
-      .catch(err => console.log('⚠️ SW:', err.message));
+      .then(function(reg) { console.log('✅ SW:', reg.scope); })
+      .catch(function(err) { console.log('⚠️ SW:', err.message); });
   });
 }
 
 function setupInstallPrompt() {
-  let deferredPrompt = null;
-  const btn = $('installBtn');
-  window.addEventListener('beforeinstallprompt', (e) => {
+  var installBtn = $('installBtn');
+  window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
-    btn.classList.add('show');
+    installBtn.classList.add('show');
   });
-  btn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
+  installBtn.addEventListener('click', function() {
+    if (!deferredPrompt) {
+      alert('Installatie is niet beschikbaar. Open via HTTPS.');
+      return;
+    }
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    btn.classList.remove('show');
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      installBtn.classList.remove('show');
+    });
+  });
+  window.addEventListener('appinstalled', function() {
+    installBtn.classList.remove('show');
   });
 }
 
+var deferredPrompt = null;
+
 document.addEventListener('DOMContentLoaded', init);
 </script>
-
 </body>
 </html>
