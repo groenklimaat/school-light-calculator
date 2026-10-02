@@ -1,50 +1,40 @@
 {
-  "name": "LightingBuro - Lighting Calculator",
-  "short_name": "LightingBuro",
-  "description": "Free PWA to calculate lighting power, energy consumption and CO2 savings. Supports 11 languages.",
-  "lang": "en",
-  "dir": "ltr",
-  "start_url": "/LightingBuro/",
-  "scope": "/LightingBuro/",
-  "id": "/LightingBuro/",
+  "id": "solarcalc-groenklimaat-v1",
+  "name": "SolarCalc - Zonnepaneel Calculator",
+  "short_name": "SolarCalc",
+  "description": "Gratis PWA om zonnepaneel vermogen, opbrengst en CO2-besparing te berekenen. Ondersteunt 13 talen.",
+  "lang": "nl",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#F1F5F9",
-  "theme_color": "#0B2B40",
+  "background_color": "#ffffff",
+  "theme_color": "#4a7dff",
   "categories": ["utilities", "productivity", "education"],
-  "prefer_related_applications": false,
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ],
-  "screenshots": [
     {
-      "src": "screenshot-wide.png",
-      "sizes": "1280x720",
+      "src": "icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "LightingBuro main page"
+      "purpose": "any"
     },
     {
-      "src": "screenshot-narrow.png",
-      "sizes": "720x1280",
+      "src": "icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "LightingBuro on mobile"
-    }
-  ],
-  "shortcuts": [
+      "purpose": "any"
+    },
     {
-      "name": "New calculation",
-      "short_name": "Calculate",
-      "description": "Start a new lighting calculation",
-      "url": "/LightingBuro/?action=new",
-      "icons": [
-        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }
-      ]
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
