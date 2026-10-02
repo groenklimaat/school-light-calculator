@@ -2,7 +2,7 @@
   "id": "schoollight-groenklimaat-v1",
   "name": "School Light Calculator",
   "short_name": "SchoolLight",
-  "description": "Gratis verlichtingscalculator voor scholen. Leer over energieverbruik, kosten en CO₂-uitstoot.",
+  "description": "Gratis verlichtingscalculator voor scholen. Leer over energieverbruik, kosten en CO2-uitstoot.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ECFDF5",
