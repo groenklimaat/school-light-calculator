@@ -36,28 +36,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshot-1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Hoofdscherm met invoervelden"
-    },
-    {
-      "src": "screenshot-2.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Berekende resultaten"
-    },
-    {
-      "src": "screenshot-3.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "CO2-uitstoot visualisatie"
-    }
   ]
 }
