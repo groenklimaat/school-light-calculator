@@ -1,7 +1,7 @@
 {
-"start_url": "./",                     ← Relatieve URL
-"scope": "./",
-"id": "schoollight-groenklimaat-v1",
+  "id": "schoollight-groenklimaat-v1",
+  "name": "School Light Calculator",
+  "short_name": "SchoolLight",
   "description": "Gratis verlichtingscalculator voor scholen. Leer over energieverbruik, kosten en CO2-uitstoot.",
   "lang": "nl",
   "start_url": "./",
